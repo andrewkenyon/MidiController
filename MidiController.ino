@@ -20,15 +20,18 @@ using namespace midi;
 
 MidiInterface* gMidiInterface;
 
+int test;
+
 /********************************************************************************/
 
 void setup()
 {  
   gMidiInterface = new MidiInterface(); //Start MidiInterface
+  test = 0;
 }
 
 void loop()
 {
-  delay(1000);
-  gMidiInterface->test();
+  
+  gMidiInterface->test(test++);
 }

@@ -30,12 +30,14 @@ namespace midi
     public:
       MidiInterface();
       ~MidiInterface();
-      boolean test();
+      void test(int testInt);
+      void update();
 
     private:
       void updateTempo();
       void pulseTempo();
 
+      void handleMsg(MidiMessage* msg);
       void handleProgramChange(byte program);
       boolean handleControlChange(byte controller, byte value);
       boolean handleSysEx(vector<byte> data);

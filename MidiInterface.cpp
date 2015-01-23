@@ -30,19 +30,19 @@ namespace midi
   }
   
   //TODO
-  boolean MidiInterface::test()
+  void MidiInterface::test(int testInt)
   {
-    this->myConnection->sendProgramChange(myProgram);
-    delay(1000);
-  
-    this->myProgram = (++myProgram)%128;
+    this->myConnection->sendExtendedProgramChange(testInt);
+    delay(100);
     
+    this->update();
+  }
+  
+  void MidiInterface::update()
+  {
     while(this->myConnection->checkBuffer())
     {
-      if(this->myConnection->getMsg()->getType() == PROGRAM_CHANGE)
-      {
-        this->myController->displayProgramNo(this->myConnection->getMsg()->getData().front());
-      }
+      this->handleMsg(this->myConnection->getMsg());
     }
   }
 
@@ -56,15 +56,37 @@ namespace midi
       this->myController->displayTempoPulse(false);
     }
   }
+  
+  void MidiInterface::handleMsg(MidiMessage* msg)
+  {
+    switch(this->myConnection->getMsg()->getType())
+    {
+      case PROGRAM_CHANGE:
+      {
+        this->handleProgramChange(this->myConnection->getMsg()->getData().front());
+        break;
+      }
+      case CONTROL_CHANGE:
+      {
+        this->handleControlChange(this->myConnection->getMsg()->getData().front(),this->myConnection->getMsg()->getData().back());
+        break;
+      }
+      default:
+      {
+        break;
+      }
+    }
+  }
 
   void MidiInterface::handleProgramChange(byte program)
   {
-      myProgram = (this->myBank*128) + program; //Calculate "extended" program number by taking into account the bank
+      this->myProgram = (int)((int)this->myBank*(int)128 + (int)program); //Calculate "extended" program number by taking into account the bank
+      this->myController->displayProgramNo(myProgram);
   }
 
   boolean MidiInterface::handleControlChange(byte controller, byte value)
   {
-    if(controller = 0) //Bank change
+    if(controller == 0) //Bank change
     {
       this->myBank = value;
       return true;

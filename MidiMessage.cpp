@@ -19,7 +19,7 @@ namespace midi
   
   MidiMessage::~MidiMessage()
   {
-    delete &myData; //Do I really want to do this?
+    //delete &myData; //Do I really want to do this?
   }
   
   /* Process command byte. Only PC, CC and SysEx are supported */

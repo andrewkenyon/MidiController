@@ -94,6 +94,7 @@ namespace midi
       
       if((msg >> 7)) //msg is a command
       {
+        delete this->myMsg;
         this->myMsg = new MidiMessage();
         if((msg & 0x0F) == this->myChannel)
         {
