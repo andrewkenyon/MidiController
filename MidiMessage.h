@@ -8,7 +8,10 @@
  
 #pragma once
 
+
 #include <vector>
+
+#include "SysExDefs.h"
 
 #include <Arduino.h>
 
@@ -35,24 +38,21 @@ namespace midi
   class MidiMessage
   {
     private:
-      byte myType; // currently only PC, CC System message (only SysEx) support intended.
-      byte myChannel; //Channel message was recieved on. For System messages this is actually the sub-type (e.g. SysEx).
-      vector<byte> myData; //PC 1 byte, CC 2 bytes, SysEx no limit.
-      byte myStatus; //INVALID, INCOMPLETE or COMPLETE
+      uint8_t myType; // currently only PC, CC System message (only SysEx) support intended.
+      uint8_t myChannel; //Channel message was recieved on. For System messages this is actually the sub-type (e.g. SysEx).
+      vector<uint8_t> myData; //PC 1 byte, CC 2 bytes, SysEx no limit.
+      uint8_t myStatus; //INVALID, INCOMPLETE or COMPLETE
       
     public: 
       MidiMessage();
       ~MidiMessage();
       
-      boolean processCommand(byte command);
-      boolean addData(byte newData);
+      bool processCommand(uint8_t command);
+      bool addData(uint8_t newData);
       
-      byte getType();
-      byte getChannel();
-      vector<byte> getData();    
-      boolean getStatus();
-      
-    private:
-      byte updateStatus();
+      uint8_t getType();
+      uint8_t getChannel();
+      vector<uint8_t> getData();    
+      uint8_t getStatus();
   };
 }

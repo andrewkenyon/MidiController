@@ -6,7 +6,7 @@
  *  @author     Andrew Kenyon
  *  @date       15/01/2015
  */
-
+ 
 #include "MidiConnection.h"
 
 namespace midi
@@ -16,14 +16,12 @@ namespace midi
   {
     Serial.begin(31250);
     this->myChannel = 0;
-    this->myBank = 0;
   }
   
   MidiConnection::MidiConnection(byte channel)
   {
     Serial.begin(31250);
     this->myChannel = channel;
-    this->myBank = 0;
   }
 		
   MidiConnection::~MidiConnection()
@@ -64,18 +62,6 @@ namespace midi
     this->sendData(program);
   }
   
-  /* Work out the bank and PC commands necessary for a Program larger than 127.
-  Try to always use this for user I/O, so as to shield user from bank number complications. */
-  void MidiConnection::sendExtendedProgramChange(int extProgram)
-  {
-    if(this->myBank != extProgram/128)
-    {
-      this->myBank = extProgram/128;
-      this->sendControlChange(CC_BANKMSB, this->myBank);
-    }
-    this->sendProgramChange(extProgram%128);
-  }
-  
   void MidiConnection::sendControlChange(byte control, byte value)
   {
     this->sendCommand(CONTROL_CHANGE);
@@ -83,10 +69,22 @@ namespace midi
     this->sendData(value);
   }
   
+  /* Send System Exclusive Message.
+  Should pass in with checksum if required, but not start or terminating byte. */
+  void MidiConnection::sendSysEx(vector<uint8_t> data)
+  {
+    Serial.write(0xF0);
+    for(uint8_t i=0; i < data.size(); i++)
+    {
+      this->sendData(data.at(i));
+    }
+    Serial.write(0xF7);
+  }
+  
   /* Check the serial buffer and assemble a message if possible.
   getMsg() must be called in order to get message.
   Will overwrite current message when called again */
-  boolean MidiConnection::checkBuffer()
+  bool MidiConnection::checkBuffer()
   {
     while(Serial.available())
     {

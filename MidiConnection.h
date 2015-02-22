@@ -19,8 +19,6 @@ namespace midi
     private: 
       byte myChannel; //1-16. The channel to listen to. Messages on others are still recieved but ignored.
       
-      byte myBank; //The midi bank (CC #0) currently used.
-      
       MidiMessage* myMsg;
 		
     public: 
@@ -39,9 +37,9 @@ namespace midi
 		
     public: 
       void sendProgramChange(byte program);
-      void sendExtendedProgramChange(int extProgram);
       void sendControlChange(byte control, byte value);
+      void sendSysEx(vector<uint8_t> data);
 			
-      boolean checkBuffer();		
+      bool checkBuffer();		
   };
 }

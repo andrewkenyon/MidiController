@@ -23,7 +23,7 @@ namespace midi
   }
   
   /* Process command byte. Only PC, CC and SysEx are supported */
-  boolean MidiMessage::processCommand(byte command)
+  bool MidiMessage::processCommand(byte command)
   {
     this->myType = (command >> 4) & 0x7;
     this->myChannel = command & 0x0F;
@@ -53,7 +53,7 @@ namespace midi
       
   /* If it is appropriate add data byte to myData as appropriate for the type.
   Update the status of the message accordingly */
-  boolean MidiMessage::addData(byte newData)
+  bool MidiMessage::addData(byte newData)
   {
     if(this->myStatus == INCOMPLETE)
     {
@@ -111,7 +111,7 @@ namespace midi
     return this->myData;  
   }
     
-  byte MidiMessage::getStatus()
+  uint8_t MidiMessage::getStatus()
   {
     return this->myStatus;
   }

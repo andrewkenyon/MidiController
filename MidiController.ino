@@ -10,6 +10,9 @@
  *  @author     Andrew Kenyon
  *  @date       15/01/2015
  */
+ 
+#include <vector>
+#include <stdint.h>
 
 #include "MidiInterface.h"
 
@@ -20,18 +23,19 @@ using namespace midi;
 
 MidiInterface* gMidiInterface;
 
-int test;
+//int test;
 
 /********************************************************************************/
 
 void setup()
 {  
   gMidiInterface = new MidiInterface(); //Start MidiInterface
-  test = 0;
+  //test = 0;
+  delay(5000);
 }
 
 void loop()
 {
-  
-  gMidiInterface->test(test++);
+  gMidiInterface->update();
+  //gMidiInterface->test(test++);
 }
