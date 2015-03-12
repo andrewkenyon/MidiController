@@ -9,6 +9,7 @@
 #pragma once
 
 #include "MidiMessage.h"
+#include "ProgramChangeMessage.h"
 
 #include <Arduino.h>
 
@@ -17,28 +18,28 @@ namespace midi
   class MidiConnection
   {
     private: 
-      byte myChannel; //1-16. The channel to listen to. Messages on others are still recieved but ignored.
+      uint8_t myChannel; //1-16. The channel to listen to. Messages on others are still recieved but ignored.
       
       MidiMessage* myMsg;
 		
     public: 
       MidiConnection();
-      MidiConnection(byte channel);
+      MidiConnection(uint8_t channel);
       ~MidiConnection();
 		
-      void setChannel(byte channel);
+      void setChannel(uint8_t channel);
 		
-      byte getChannel();
+      uint8_t getChannel();
       MidiMessage* getMsg();
 			
     private: 
-      void sendCommand(byte command);
-      void sendData(byte data);
+      void sendCommand(uint8_t command);
+      void sendData(uint8_t data);
 		
     public: 
-      void sendProgramChange(byte program);
-      void sendControlChange(byte control, byte value);
-      void sendSysEx(vector<uint8_t> data);
+      void sendProgramChange(uint8_t program);
+      void sendControlChange(uint8_t control, uint8_t value);
+	  void sendSysEx(std::vector<uint8_t> data);
 			
       bool checkBuffer();		
   };

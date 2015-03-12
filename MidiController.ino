@@ -1,3 +1,4 @@
+
 #include <StandardCplusplus.h>
 #include <system_configuration.h>
 #include <unwind-cxx.h>
@@ -23,19 +24,19 @@ using namespace midi;
 
 MidiInterface* gMidiInterface;
 
-//int test;
+uint16_t test;
 
 /********************************************************************************/
 
 void setup()
 {  
   gMidiInterface = new MidiInterface(); //Start MidiInterface
-  //test = 0;
+  test = 10;
   delay(5000);
 }
 
 void loop()
 {
-  gMidiInterface->update();
-  //gMidiInterface->test(test++);
+  //gMidiInterface->update();
+  gMidiInterface->test(test++);
 }

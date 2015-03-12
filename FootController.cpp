@@ -7,17 +7,30 @@
  */
 
 #include "FootController.h"
+#include "SelectSwitch.h"
 
 using namespace std;
+
+class Footswitch;
 
 namespace midi
 {
   FootController::FootController()
   {
-    this->myLcd = new LiquidCrystal(12, 11, 5, 4, 3, 2);
+    this->myLcd = new LiquidCrystal(7, 6, 5, 4, 3, 2);
     this->myLcd->begin(LCD_COLUMNS,LCD_ROWS);
     
-    this->mySwitches = vector<Footswitch>(SWITCHES);
+    this->mySwitches = vector<Footswitch*>(SWITCHES);
+    this->mySwitches.push_back(new SelectSwitch());
+    this->mySwitches.push_back(new SelectSwitch());
+    this->mySwitches.push_back(new SelectSwitch());
+    this->mySwitches.push_back(new SelectSwitch());
+    this->mySwitches.push_back(new SelectSwitch());
+    //this->mySwitches.push_back(new PageChangeSwitch());
+    //this->mySwitches.push_back(new TempoTunerSwitch());
+    //this->mySwitches.push_back(new BankSwitch());
+    
+    this->myPage = PAGE_PRESETS;
   }
   
   FootController::~FootController()
@@ -27,7 +40,7 @@ namespace midi
   /* Displays preset number in top left of LCD.
  Accepts int, so can accept larger values than the actual MIDI program 
  limit of 128 (MidiInterface uses bank changes to get around this). */
-  void FootController::displayProgramNumber(int programNumber)
+  void FootController::displayProgramNumber(uint16_t programNumber)
   {
     this->myLcd->setCursor(0, 0);
     int position = this->myLcd->print("Pre ");
@@ -76,7 +89,7 @@ namespace midi
   in order to show as 50/50 on/off pulse */
   void FootController::displayTempoPulse(bool display)
   {
-    this->myLcd->setCursor(15, 0);
+    this->myLcd->setCursor(LCD_COLUMNS-1, 0);
     if (display)
     {
       this->myLcd->print("!");
@@ -87,7 +100,7 @@ namespace midi
     }
   }
   
-  void FootController::displayTuner(String note, byte string, byte cents)
+  void FootController::displayTuner(String note, uint8_t string, uint8_t cents)
   {
     this->myLcd->setCursor(0,0);
     int position = this->myLcd->print(note);
@@ -129,7 +142,7 @@ namespace midi
     vector<int16_t> presses = vector<int16_t>(SWITCHES);
     for(uint8_t i=0; i < this->mySwitches.size(); i++)
     {
-      presses.at(i) = this->mySwitches.at(i).updateFootswitch(status.at(i));
+      presses.at(i) = this->mySwitches.at(i)->updateFootswitch(status.at(i));
     }
     return presses;
   }
@@ -139,7 +152,7 @@ namespace midi
     //Update state in software
     for(uint8_t i=0; this->mySwitches.size(); i++)
     {
-      this->mySwitches.at(i).updateLed(states.at(i));
+      this->mySwitches.at(i)->updateLed(states.at(i));
     }
     
     //TODO: Send state info to hardware through shift register

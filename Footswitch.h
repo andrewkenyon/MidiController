@@ -14,6 +14,10 @@
 
 namespace midi
 {
+
+	#define LONG_PRESS 1000
+
+  /* General abstract class to represent footswitch common functionality */
   class Footswitch
   {
     private:
@@ -21,10 +25,37 @@ namespace midi
       uint8_t myLedState; //Currently just on and off.
       
     public:
-      Footswitch();
-      ~Footswitch();
-
       int16_t updateFootswitch(bool pressed); //Updates current press.
       void updateLed(uint8_t state);
+    
+    protected:
+      void init();
+      
+    private:
+      virtual bool handlePress(uint16_t duration);
   };
+  
+  /*
+  class BankSwitch : public Footswitch
+  {
+    public:
+      BankSwitch();
+      ~BankSwitch();
+    
+    private:
+      bool handlePress(uint16_t duration);
+  };
+  
+  class TempoTunerSwitch : public Footswitch
+  {
+    private:
+      bool handlePress(uint16_t duration);
+  };
+  
+  class PageChangeSwitch : public Footswitch
+  {
+    private:
+      bool handlePress(uint16_t duration);
+  };
+  */
 }

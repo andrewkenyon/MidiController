@@ -12,53 +12,70 @@ using namespace std;
 
 namespace midi
 {      
-  MidiMessage::MidiMessage()
+  MidiMessage::MidiMessage(uint8_t type)
   {
     this->myStatus = INVALID; //At initiallisation no command has been recieved, so there is no message yet!
+    this->myType = type;
   }
   
   MidiMessage::~MidiMessage()
   {
-    //delete &myData; //Do I really want to do this?
+  }
+
+  ControlChangeMessage::ControlChangeMessage(uint8_t channel) : MidiMessage::MidiMessage(PROGRAM_CHANGE)
+  {
+	  this->myChannel = channel;
+  }
+
+  ControlChangeMessage::~ControlChangeMessage()
+  {
   }
   
-  /* Process command byte. Only PC, CC and SysEx are supported */
-  bool MidiMessage::processCommand(byte command)
+  SystemMessage::SystemMessage(uint8_t subType) : MidiMessage::MidiMessage(SYSTEM_MESSAGE)
   {
-    this->myType = (command >> 4) & 0x7;
-    this->myChannel = command & 0x0F;
-    
-    /*SysEx is actually a subtype of system messages. 
-    The type (bits 2-4) is really for system msg (7), requiring the usual "channel" bits to select 0 for SysEx. 
-    We do not support the other types, but must still check and disregard if not 0xF0.*/
-    if((this->myType == SYSTEM_EXCLUSIVE)&&(this->myChannel != 0))
-    {
-      this->myStatus = INVALID;
-      return false;
-    }
-    else
-    {
-      if(this->myType == SYSTEM_EXCLUSIVE)
-      {
-        this->myData.reserve(20); //Target hardware largest message was < 20, so shouldn't need to reallocate. But...
-      }
-      else
-      {
-        this->myData.reserve(2);
-      }
-      this->myStatus = INCOMPLETE;
-      return true;
-    }
+    this->mySubType = subType;
   }
+  
+  SystemMessage::~SystemMessage()
+  {
+  }
+  
+  /************************************************************************/
       
+
   /* If it is appropriate add data byte to myData as appropriate for the type.
   Update the status of the message accordingly */
-  bool MidiMessage::addData(byte newData)
+  bool ControlChangeMessage::addData(uint8_t newData)
+  {
+	  if (this->myStatus == INCOMPLETE)
+	  {
+		  if (this->myData.size() < 2)
+		  {
+			  this->myData.push_back(newData);
+			  if (this->myData.size() == 2)
+			  {
+				  this->myStatus = COMPLETE;
+			  }
+			  return true;
+		  }
+		  else
+		  {
+			  this->myStatus = INVALID;
+			  return false;
+		  }
+	  }
+	  else
+	  {
+		  return false;
+	  }
+  }
+
+  /* If it is appropriate add data byte to myData as appropriate for the type.
+  Update the status of the message accordingly */
+  bool SystemMessage::addData(byte newData)
   {
     if(this->myStatus == INCOMPLETE)
     {
-      if(this->myType == SYSTEM_EXCLUSIVE)
-      {
         if(newData == 0x7F)
         {
           this->myStatus = COMPLETE;
@@ -68,27 +85,6 @@ namespace midi
           this->myData.push_back(newData);
         }
         return true; 
-      }
-      else if( ((this->myType == PROGRAM_CHANGE) || (this->myType == CHANNEL_PRESSURE)) && (this->myData.size() < 1) )
-      {          
-        this->myData.push_back(newData);
-        this->myStatus = COMPLETE;
-        return true; 
-      }
-      else if((this->myType != SYSTEM_EXCLUSIVE) && (this->myData.size() < 2))
-      {
-        this->myData.push_back(newData);
-        if(this->myData.size() == 2)
-        {
-          this->myStatus = COMPLETE;
-        }
-        return true;    
-      }
-      else
-      {
-        this->myStatus = INVALID;
-        return false;
-      }
     }
     else
     {
@@ -101,11 +97,6 @@ namespace midi
     return this->myType;
   }
   
-  byte MidiMessage::getChannel()
-  {
-    return this->getChannel();
-  }
-  
   vector<byte> MidiMessage::getData()
   {
     return this->myData;  
@@ -116,4 +107,9 @@ namespace midi
     return this->myStatus;
   }
   
+  uint8_t ControlChangeMessage::getChannel()
+  {
+	  return this->getChannel();
+  }
+
 }

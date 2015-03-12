@@ -15,34 +15,37 @@
 #include <LiquidCrystal.h>
 #include <Arduino.h>
 
-#define LCD_COLUMNS 16
-#define LCD_ROWS 2
-
-#define SWITCHES 8
-
-using namespace std;
-
 namespace midi
 {
-  class FootController
-  {
-    private:
-      LiquidCrystal* myLcd;
-      vector<Footswitch> mySwitches;
-      
-    public:
-      FootController();
-      ~FootController();
+	#define LCD_COLUMNS 16
+	#define LCD_ROWS 2
 
-      void displayProgramNumber(int programNumber);
-      void displayProgramName(String programName);
+	#define SWITCHES 8
 
-      int displayBpm(int tempo);
-      void displayTempoPulse(bool pulse);
+	#define PAGE_PRESETS 0
+	#define PAGE_IA 1
+	#define PAGE_LOOPER 2
+
+	class FootController
+	{
+	private:
+		LiquidCrystal* myLcd;
+		std::vector<Footswitch*> mySwitches;
+		uint8_t myPage;
       
-      void displayTuner(String note, byte string, byte cents);
+	public:
+		FootController();
+		~FootController();
+
+		void displayProgramNumber(uint16_t programNumber);
+		void displayProgramName(String programName);
+
+		int displayBpm(int tempo);
+		void displayTempoPulse(bool pulse);
       
-      vector<int16_t> updateFootswitches();
-      void updateLeds(vector<uint8_t> states);
-  };
+		void displayTuner(String note, uint8_t string, uint8_t cents);
+      
+		std::vector<int16_t> updateFootswitches();
+		void updateLeds(std::vector<uint8_t> states);
+	};
 }

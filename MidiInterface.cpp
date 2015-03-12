@@ -8,6 +8,8 @@
 
 #include "MidiInterface.h"
 
+using namespace std;
+
 namespace midi
 {    
   MidiInterface::MidiInterface()
@@ -16,7 +18,7 @@ namespace midi
     this->myController = new FootController();
     
     this->myProgram = 0;
-    this->myBank = -1; //Force bank change on first program change.
+    this->myBank = 0; //Force bank change on first program change.
       
     this->myTempo = 60; 
     this->myPreviousTempoPulse = millis();
@@ -29,7 +31,7 @@ namespace midi
   }
   
   //TODO
-  void MidiInterface::test(int testInt)
+  void MidiInterface::test(uint16_t testInt)
   {
     this->sendExtendedProgramChange(testInt);
     delay(100);
@@ -46,7 +48,7 @@ namespace midi
     }
     
     //Foot controller input
-    this->myController->updateLeds(this->handleFootswitches(this->myController->updateFootswitches()));
+    //this->myController->updateLeds(this->handleFootswitches(this->myController->updateFootswitches()));
     
     //MIDI output
     
@@ -140,12 +142,12 @@ namespace midi
   Try to always use this for user I/O, so as to shield user from bank number complications. */
   void MidiInterface::sendExtendedProgramChange(uint16_t extProgram)
   {
-    if(this->myBank != (int8_t)(extProgram/128))
+    if(this->myBank != (uint8_t)(extProgram/(uint16_t)128))
     {
-      this->myBank = (int8_t)(extProgram/128);
-      this->myConnection->sendControlChange(CC_BANKMSB, this->myBank);
+      this->myBank = (uint8_t)(extProgram/128);
+      this->myConnection->sendControlChange((uint8_t)CC_BANKMSB, this->myBank);
     }
-    this->myConnection->sendProgramChange(extProgram%128);
+    this->myConnection->sendProgramChange((uint8_t)(extProgram%128));
   }
   
   /*************************************************************************************************/
@@ -327,40 +329,39 @@ namespace midi
   
   /* Handle Messages */
   
-  void MidiInterface::handleMsg(MidiMessage* msg)
+  bool MidiInterface::handleMsg(MidiMessage* msg)
   {
-    switch(this->myConnection->getMsg()->getType())
+    switch(msg->getType())
     {
       case PROGRAM_CHANGE:
       {
-        this->handleProgramChange(this->myConnection->getMsg()->getData().front());
-        break;
+        return this->handleProgramChange(msg->getData().front());
       }
       case CONTROL_CHANGE:
       {
-        this->handleControlChange(this->myConnection->getMsg()->getData().front(),this->myConnection->getMsg()->getData().back());
-        break;
+        this->handleControlChange(msg->getData().front(), msg->getData().back());
       }
-      case SYSTEM_EXCLUSIVE:
+      case SYSTEM_MESSAGE:
       {
-        this->handleSysEx(this->myConnection->getMsg()->getData());
+        return this->handleSysEx(msg->getData());
       }
       default:
       {
-        break;
+        return false;
       }
     }
   }
 
-  void MidiInterface::handleProgramChange(uint8_t program)
+  bool MidiInterface::handleProgramChange(uint8_t program)
   {
-      this->myProgram = (int)((int)this->myBank*(int)128 + (int)program); //Calculate "extended" program number by taking into account the bank
-      this->myController->displayProgramNumber(myProgram);
+      this->myProgram = (uint16_t)((uint16_t)this->myBank*(uint16_t)128 + (uint16_t)program); //Calculate "extended" program number by taking into account the bank
+      this->myController->displayProgramNumber(this->myProgram);
+      return true;
   }
 
   bool MidiInterface::handleControlChange(uint8_t controller, uint8_t value)
   {
-    if(controller == 0) //Bank change
+    if(controller == (uint8_t)CC_BANKMSB) //Bank change
     {
       this->myBank = value;
       return true;

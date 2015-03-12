@@ -10,14 +10,11 @@
 
 namespace midi
 {  
-  Footswitch::Footswitch()
+  
+  void Footswitch::init()
   {
     this->myCurrentPress = -1;
     this->myLedState = 0;
-  }
-  
-  Footswitch::~Footswitch()
-  {
   }
   
   // Updates current press. When switch is released sends length of button press
@@ -30,7 +27,8 @@ namespace midi
     }
     else if(!pressed && (this->myCurrentPress >= 0))
     {
-      uint16_t press = this->myCurrentPress;
+      uint16_t press = millis() - this->myCurrentPress;
+      this->handlePress(press);
       this->myCurrentPress = -1;
       return press;
     }
