@@ -6,8 +6,6 @@
 
 namespace midi
 {
-	class MidiMessage;
-
 	ProgramChangeMessage::ProgramChangeMessage(uint8_t channel) : MidiMessage::MidiMessage(PROGRAM_CHANGE)
 	{
 		this->myChannel = channel;

@@ -8,8 +8,9 @@
  
 #pragma once
 
-#include "MidiMessage.h"
 #include "ProgramChangeMessage.h"
+#include "ControlChangeMessage.h"
+#include "SysExMessage.h"
 
 #include <Arduino.h>
 

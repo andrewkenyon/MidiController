@@ -10,8 +10,6 @@
 
 #include <vector>
 
-#include "SysExDefs.h"
-
 #include <Arduino.h>
 
 namespace midi
@@ -49,29 +47,5 @@ namespace midi
 	  std::vector<uint8_t> getData();
       uint8_t getStatus();
   };
-  
-  class ControlChangeMessage : public MidiMessage
-  {
-  private:
-	  uint8_t myChannel; //Channel message was recieved on. For System messages this is actually the sub-type (e.g. SysEx).
 
-  public:
-	  ControlChangeMessage(uint8_t channel);
-	  ~ControlChangeMessage();
-
-	  uint8_t getChannel();
-	  bool addData(uint8_t newData);
-  };
-  
-  class SystemMessage : public MidiMessage
-  {    
-    private:    
-      uint8_t mySubType; //For System messages second half of byte is the sub-type (e.g. SysEx).
-      
-    public: 
-      SystemMessage(uint8_t subType);
-      ~SystemMessage();
-      
-      bool addData(uint8_t newData);
-  };
 }
