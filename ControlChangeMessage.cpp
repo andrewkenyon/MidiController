@@ -6,9 +6,10 @@
 
 namespace midi
 {
-	ControlChangeMessage::ControlChangeMessage(uint8_t channel) : MidiMessage::MidiMessage(PROGRAM_CHANGE)
+	ControlChangeMessage::ControlChangeMessage(uint8_t channel) : MidiMessage::MidiMessage(CONTROL_CHANGE)
 	{
 		this->myChannel = channel;
+		this->myDataCounter = 0;
 	}
 
 	ControlChangeMessage::~ControlChangeMessage()
@@ -21,10 +22,14 @@ namespace midi
 	{
 		if (this->myStatus == INCOMPLETE)
 		{
-			if (this->myData.size() < 2)
+			if (this->myDataCounter < 1)
 			{
-				this->myData.push_back(newData);
-				if (this->myData.size() == 2)
+				this->myControllerNumber == newData;
+			}
+			else if (this->myDataCounter < 2)
+			{
+				this->myControllerValue == newData;
+				if (this->myDataCounter == 2)
 				{
 					this->myStatus = COMPLETE;
 				}
@@ -42,10 +47,19 @@ namespace midi
 		}
 	}
 
-	uint8_t ControlChangeMessage::getChannel()
+	uint8_t ControlChangeMessage::getChannel() const
 	{
 		return this->getChannel();
 	}
 
+	uint8_t ControlChangeMessage::getControllerNumber() const
+	{
+		return this->myControllerNumber;
+	}
+
+	uint8_t ControlChangeMessage::getControllerValue() const
+	{
+		return this->myControllerValue;
+	}
 }
 

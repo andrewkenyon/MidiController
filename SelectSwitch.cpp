@@ -3,16 +3,16 @@
  *  @brief      Handles main bottom row "select" switch I/0.
  *  @version    0.1
  *  @author     Andrew Kenyon
- *  @date       18/02/2015
+ *  @date       10/05/2015
  */
 
 #include "SelectSwitch.h"
 
 namespace midi
 {    
-  SelectSwitch::SelectSwitch()
+  SelectSwitch::SelectSwitch(FootController* ctrl, uint8_t switchNumber) : Footswitch(ctrl)
   {
-    Footswitch::init();
+	  this->myNumber = switchNumber;
   }
   
   SelectSwitch::~SelectSwitch()
@@ -21,7 +21,10 @@ namespace midi
   
   bool SelectSwitch::handlePress(uint16_t duration)
   {
-    // TODO
+    // Ignore short/long presses for now
+	
+	this->myFootController->changeProgramWithinBank(this->myNumber);
+	
     return true;
   }
   

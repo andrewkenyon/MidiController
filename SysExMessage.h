@@ -64,16 +64,18 @@ namespace midi
 		"Ab"
 	};
 
-	class SystemMessage : public MidiMessage
+	class SysExMessage : public MidiMessage
 	{
+
 	private:
-		uint8_t mySubType; //For System messages second half of byte is the sub-type (e.g. SysEx).
+		std::vector<uint8_t> myData;
 
 	public:
-		SystemMessage(uint8_t subType);
-		~SystemMessage();
+		SysExMessage();
+		~SysExMessage();
 
 		bool addData(uint8_t newData);
+		const std::vector<uint8_t>& getData() const;
 	};
 }
 

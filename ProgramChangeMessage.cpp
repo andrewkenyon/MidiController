@@ -16,30 +16,28 @@ namespace midi
 	}
 	/* If it is appropriate add data byte to myData as appropriate for the type.
 	Update the status of the message accordingly */
-	bool ProgramChangeMessage::addData(uint8_t newData)
+	bool ProgramChangeMessage::addData(const uint8_t newData)
 	{
 		if (this->myStatus == INCOMPLETE)
 		{
-			if (this->myData.size() < 1)
-			{
-				this->myData.push_back(newData);
+				this->myProgram = newData;
 				this->myStatus = COMPLETE;
 				return true;
-			}
-			else
-			{
-				this->myStatus = INVALID;
-				return false;
-			}
 		}
 		else
 		{
+			this->myStatus = INVALID;
 			return false;
 		}
 	}
 
-	byte ProgramChangeMessage::getChannel()
+	uint8_t ProgramChangeMessage::getChannel() const
 	{
 		return this->getChannel();
+	}
+
+	uint8_t ProgramChangeMessage::getProgram() const
+	{
+		return this->myProgram;
 	}
 }

@@ -10,7 +10,7 @@
  *  @author     Andrew Kenyon
  *  @date       15/01/2015
  */
- 
+
 #include <vector>
 #include <stdint.h>
 
@@ -28,8 +28,8 @@ uint16_t test;
 /********************************************************************************/
 
 void setup()
-{  
-  gMidiInterface = new MidiInterface(); //Start MidiInterface
+{
+  gMidiInterface = new MidiInterface((int8_t) 0); //Start MidiInterface
   test = 10;
   delay(5000);
 }

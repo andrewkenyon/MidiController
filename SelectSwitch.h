@@ -17,8 +17,11 @@ namespace midi
 	class SelectSwitch : public Footswitch
 	{
 	public:
-		SelectSwitch();
+		SelectSwitch(FootController* ctrl, uint8_t switchNumber);
 		~SelectSwitch();
+		
+	private:
+		uint8_t myNumber;
 
 	private:
 		bool handlePress(uint16_t duration);

@@ -19,29 +19,21 @@ namespace midi
   class MidiConnection
   {
     private: 
-      uint8_t myChannel; //1-16. The channel to listen to. Messages on others are still recieved but ignored.
-      
       MidiMessage* myMsg;
 		
     public: 
       MidiConnection();
-      MidiConnection(uint8_t channel);
-      ~MidiConnection();
-		
-      void setChannel(uint8_t channel);
-		
-      uint8_t getChannel();
+	  ~MidiConnection();
+
+	  void sendProgramChange(const ProgramChangeMessage& pc) const;
+	  void sendControlChange(const ControlChangeMessage& cc) const;
+	  void sendSysEx(const SysExMessage& sysEx) const;
+	  
+	  bool checkBuffer();
       MidiMessage* getMsg();
 			
     private: 
-      void sendCommand(uint8_t command);
-      void sendData(uint8_t data);
-		
-    public: 
-      void sendProgramChange(uint8_t program);
-      void sendControlChange(uint8_t control, uint8_t value);
-	  void sendSysEx(std::vector<uint8_t> data);
-			
-      bool checkBuffer();		
+      void sendCommand(const uint8_t command, const uint8_t channelOrSubtype) const;
+      void sendData(const uint8_t data) const;	
   };
 }

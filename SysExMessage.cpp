@@ -4,21 +4,21 @@
 
 #include "SysExMessage.h"
 
+using namespace std;
+
 namespace midi
 {
 
-	SystemMessage::SystemMessage(uint8_t subType) : MidiMessage::MidiMessage(SYSTEM_MESSAGE)
+	SysExMessage::SysExMessage() : MidiMessage::MidiMessage(SYSTEM_MESSAGE)
 	{
-		this->mySubType = subType;
 	}
-
-	SystemMessage::~SystemMessage()
+	SysExMessage::~SysExMessage()
 	{
 	}
 
 	/* If it is appropriate add data byte to myData as appropriate for the type.
 	Update the status of the message accordingly */
-	bool SystemMessage::addData(byte newData)
+	bool SysExMessage::addData(uint8_t newData)
 	{
 		if (this->myStatus == INCOMPLETE)
 		{
@@ -36,6 +36,11 @@ namespace midi
 		{
 			return false;
 		}
+	}
+
+	const vector<uint8_t>& SysExMessage::getData() const
+	{
+		return this->myData;
 	}
 
 

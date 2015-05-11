@@ -3,7 +3,7 @@
  *  @brief      MIDI command/data message class.
  *  @version    0.1
  *  @author     Andrew Kenyon
- *  @date       15/01/2015
+ *  @date       11/05/2015
  */
  
 #pragma once
@@ -34,7 +34,6 @@ namespace midi
   {
     protected:
       uint8_t myType; // currently only PC, CC System message (only SysEx) support intended.
-      std::vector<uint8_t> myData; //PC 1 byte, CC 2 bytes, SysEx no limit.
       uint8_t myStatus; //INVALID, INCOMPLETE or COMPLETE
       
     public: 
@@ -43,9 +42,8 @@ namespace midi
       
       virtual bool addData(uint8_t newData) = 0;
       
-      uint8_t getType();
-	  std::vector<uint8_t> getData();
-      uint8_t getStatus();
+	  uint8_t getType() const;
+	  uint8_t getStatus() const;
   };
 
 }

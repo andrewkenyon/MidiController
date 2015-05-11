@@ -6,16 +6,21 @@
  *  @date       18/02/2015
  */
  
-#include "Footswitch.h"
+#include "FootSwitch.h"
 
 namespace midi
 {  
-  
-  void Footswitch::init()
-  {
-    this->myCurrentPress = -1;
-    this->myLedState = 0;
-  }
+	Footswitch::Footswitch(FootController* ctrl)
+	{
+		this->myFootController = ctrl;
+		this->myCurrentPress = -1;
+		this->myLedState = 0;
+	}
+	
+	Footswitch::~Footswitch()
+	{
+		
+	}
   
   // Updates current press. When switch is released sends length of button press
   int16_t Footswitch::updateFootswitch(bool pressed)
@@ -39,5 +44,7 @@ namespace midi
   {
     this->myLedState = state;
   }
+  
+  
   
 }

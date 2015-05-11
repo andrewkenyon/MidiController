@@ -3,7 +3,7 @@
  *  @brief      MIDI command/data message class.
  *  @version    0.1
  *  @author     Andrew Kenyon
- *  @date       15/01/2015
+ *  @date       10/05/2015
  */
 
 #include "MidiMessage.h"
@@ -24,17 +24,12 @@ namespace midi
   
   /************************************************************************/
 
-  uint8_t MidiMessage::getType()
+  uint8_t MidiMessage::getType() const
   {
     return this->myType;
   }
   
-  vector<uint8_t> MidiMessage::getData()
-  {
-    return this->myData;  
-  }
-    
-  uint8_t MidiMessage::getStatus()
+  uint8_t MidiMessage::getStatus() const
   {
     return this->myStatus;
   }

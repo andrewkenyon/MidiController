@@ -1,0 +1,55 @@
+<NotepadPlus>
+    <Project name="MidiController">
+        <Folder name="Midi">
+            <Folder name="MidiMessage">
+                <File name="MidiMessage.h" />
+                <File name="MidiMessage.cpp" />
+                <Folder name="ProgramChangeMessage">
+                    <File name="ProgramChangeMessage.cpp" />
+                    <File name="ProgramChangeMessage.h" />
+                </Folder>
+                <Folder name="ControlChangeMessage">
+                    <File name="ControlChangeMessage.h" />
+                    <File name="ControlChangeMessage.cpp" />
+                </Folder>
+                <Folder name="SysExMessage">
+                    <File name="SysExMessage.h" />
+                    <File name="SysExMessage.cpp" />
+                </Folder>
+            </Folder>
+            <Folder name="MidiConnection">
+                <File name="MidiConnection.h" />
+                <File name="MidiConnection.cpp" />
+            </Folder>
+            <Folder name="MidiInterface">
+                <File name="MidiInterface.h" />
+                <File name="MidiInterface.cpp" />
+            </Folder>
+        </Folder>
+        <Folder name="Controller">
+            <File name="FootController.h" />
+            <File name="FootController.cpp" />
+            <Folder name="Footswitch">
+                <File name="Footswitch.h" />
+                <File name="Footswitch.cpp" />
+                <Folder name="BankSwitch">
+                    <File name="BankSwitch.h" />
+                    <File name="BankSwitch.cpp" />
+                </Folder>
+                <Folder name="PageChangeSwitch">
+                    <File name="PageChangeSwitch.h" />
+                    <File name="PageChangeSwitch.cpp" />
+                </Folder>
+                <Folder name="SelectSwitch">
+                    <File name="SelectSwitch.h" />
+                    <File name="SelectSwitch.cpp" />
+                </Folder>
+                <Folder name="TempoTunerSwitch">
+                    <File name="TempoTunerSwitch.h" />
+                    <File name="TempoTunerSwitch.cpp" />
+                </Folder>
+            </Folder>
+        </Folder>
+        <File name="MidiController.ino" />
+    </Project>
+</NotepadPlus>

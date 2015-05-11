@@ -3,11 +3,12 @@
  *  @brief      Handles user I/O (LCD, switches and LEDs)
  *  @version    0.1
  *  @author     Andrew Kenyon
- *  @date       18/01/2015
+ *  @date       10/05/2015
  */
  
 #pragma once
 
+#include "MidiInterface.h"
 #include "Footswitch.h"
 
 #include <vector>
@@ -21,20 +22,26 @@ namespace midi
 	#define LCD_ROWS 2
 
 	#define SWITCHES 8
+	#define BANK_SIZE 5
 
 	#define PAGE_PRESETS 0
 	#define PAGE_IA 1
 	#define PAGE_LOOPER 2
+	
+	class Footswitch;
+	class MidiInterface;
 
 	class FootController
 	{
 	private:
+		MidiInterface* myInterface;
 		LiquidCrystal* myLcd;
 		std::vector<Footswitch*> mySwitches;
 		uint8_t myPage;
+		uint8_t myBank; //Not the same as the MIDI bank!
       
 	public:
-		FootController();
+		FootController(MidiInterface* interface);
 		~FootController();
 
 		void displayProgramNumber(uint16_t programNumber);
@@ -47,5 +54,7 @@ namespace midi
       
 		std::vector<int16_t> updateFootswitches();
 		void updateLeds(std::vector<uint8_t> states);
+		
+		void changeProgramWithinBank(uint8_t preset);
 	};
 }

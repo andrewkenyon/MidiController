@@ -3,38 +3,48 @@
  *  @brief      Handles user I/O (LCD, switches and LEDs)
  *  @version    0.1
  *  @author     Andrew Kenyon
- *  @date       17/01/2015
+ *  @date       10/05/2015
  */
 
 #include "FootController.h"
+#include "BankSwitch.h"
+#include "PageChangeSwitch.h"
 #include "SelectSwitch.h"
+#include "TempoTunerSwitch.h"
 
 using namespace std;
 
-class Footswitch;
-
 namespace midi
 {
-  FootController::FootController()
-  {
-    this->myLcd = new LiquidCrystal(7, 6, 5, 4, 3, 2);
-    this->myLcd->begin(LCD_COLUMNS,LCD_ROWS);
-    
-    this->mySwitches = vector<Footswitch*>(SWITCHES);
-    this->mySwitches.push_back(new SelectSwitch());
-    this->mySwitches.push_back(new SelectSwitch());
-    this->mySwitches.push_back(new SelectSwitch());
-    this->mySwitches.push_back(new SelectSwitch());
-    this->mySwitches.push_back(new SelectSwitch());
-    //this->mySwitches.push_back(new PageChangeSwitch());
-    //this->mySwitches.push_back(new TempoTunerSwitch());
-    //this->mySwitches.push_back(new BankSwitch());
-    
-    this->myPage = PAGE_PRESETS;
-  }
+	FootController::FootController(MidiInterface* interface)
+	{
+		this->myInterface = interface;
+		  this->myBank = 0;
+		  
+		this->myLcd = new LiquidCrystal(7, 6, 5, 4, 3, 2);
+		this->myLcd->begin(LCD_COLUMNS,LCD_ROWS);
+
+		this->mySwitches = vector<Footswitch*>(SWITCHES);
+		this->mySwitches.push_back(new SelectSwitch(this, 0));
+		this->mySwitches.push_back(new SelectSwitch(this, 1));
+		this->mySwitches.push_back(new SelectSwitch(this, 2));
+		this->mySwitches.push_back(new SelectSwitch(this, 3));
+		this->mySwitches.push_back(new SelectSwitch(this, 4));
+		this->mySwitches.push_back(new PageChangeSwitch(this));
+		this->mySwitches.push_back(new TempoTunerSwitch(this));
+		this->mySwitches.push_back(new BankSwitch(this));
+
+		this->myPage = PAGE_PRESETS;
+	}
   
   FootController::~FootController()
   {
+	  delete this->myLcd;
+	  
+	  for(int i=0; i < this->mySwitches.size(); i++)
+	  {
+		  delete this->mySwitches.at(i);
+	  }
   }
 
   /* Displays preset number in top left of LCD.
@@ -158,4 +168,10 @@ namespace midi
     //TODO: Send state info to hardware through shift register
   }
   
+  
+	void FootController::changeProgramWithinBank(uint8_t preset)
+	{
+		this->myInterface->sendExtendedProgramChange(this->myBank*BANK_SIZE + preset);
+	}	
+		
 }

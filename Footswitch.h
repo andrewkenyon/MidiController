@@ -12,50 +12,34 @@
 
 #include <Arduino.h>
 
+#include "FootController.h"
+
 namespace midi
 {
 
 	#define LONG_PRESS 1000
+	
+	class FootController;
 
   /* General abstract class to represent footswitch common functionality */
   class Footswitch
   {
-    private:
+	  public:
+		Footswitch(FootController* ctrl);
+		virtual ~Footswitch();
+	  
+    protected:
       int16_t myCurrentPress; //Negative value means not pressed
       uint8_t myLedState; //Currently just on and off.
-      
+	  FootController* myFootController;
+          
+	private:
+      virtual bool handlePress(uint16_t duration) = 0;
+	  
     public:
       int16_t updateFootswitch(bool pressed); //Updates current press.
-      void updateLed(uint8_t state);
-    
-    protected:
-      void init();
-      
-    private:
-      virtual bool handlePress(uint16_t duration);
+      void updateLed(uint8_t state);     
+
   };
-  
-  /*
-  class BankSwitch : public Footswitch
-  {
-    public:
-      BankSwitch();
-      ~BankSwitch();
-    
-    private:
-      bool handlePress(uint16_t duration);
-  };
-  
-  class TempoTunerSwitch : public Footswitch
-  {
-    private:
-      bool handlePress(uint16_t duration);
-  };
-  
-  class PageChangeSwitch : public Footswitch
-  {
-    private:
-      bool handlePress(uint16_t duration);
-  };
-  */
+ 
 }

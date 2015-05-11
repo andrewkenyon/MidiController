@@ -17,13 +17,16 @@ namespace midi
 	{
 	private:
 		uint8_t myChannel; //Channel message was recieved on. For System messages this is actually the sub-type (e.g. SysEx).
+		uint8_t myProgram;
 
 	public:
 		ProgramChangeMessage(uint8_t channel);
 		~ProgramChangeMessage();
 
-		uint8_t getChannel();
+		uint8_t getChannel() const;
 		bool addData(uint8_t newData);
+
+		uint8_t getProgram() const;
 	};
 }
 
