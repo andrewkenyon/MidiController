@@ -27,6 +27,8 @@ namespace midi
 		bool addData(uint8_t newData);
 
 		uint8_t getProgram() const;
+		
+		void sendMessage(MidiConnection* conn);
 	};
 }
 

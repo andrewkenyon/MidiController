@@ -68,14 +68,19 @@ namespace midi
 	{
 
 	private:
-		std::vector<uint8_t> myData;
+		std::vector<uint8_t> myManufacturer;
+		std::vector<uint8_t> myBody;
 
 	public:
 		SysExMessage();
 		~SysExMessage();
 
 		bool addData(uint8_t newData);
-		const std::vector<uint8_t>& getData() const;
+		bool checkManufacturer(uint8_t man0, uint8_t man1, uint8_t man2) const; 
+		const std::vector<uint8_t>& getManufacturer() const;
+		const std::vector<uint8_t>& getBody() const;
+		
+		void sendMessage(MidiConnection* conn);
 	};
 }
 

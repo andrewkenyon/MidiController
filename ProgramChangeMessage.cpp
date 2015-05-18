@@ -40,4 +40,13 @@ namespace midi
 	{
 		return this->myProgram;
 	}
+	
+	
+	/* Send program change without changing bank. */		
+	void ProgramChangeMessage::sendMessage(MidiConnection* conn)
+	{
+		conn->sendCommand(PROGRAM_CHANGE, this->myChannel);
+		conn->sendData(this->myProgram);
+	}
+	
 }

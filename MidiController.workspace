@@ -5,8 +5,8 @@
                 <File name="MidiMessage.h" />
                 <File name="MidiMessage.cpp" />
                 <Folder name="ProgramChangeMessage">
-                    <File name="ProgramChangeMessage.cpp" />
                     <File name="ProgramChangeMessage.h" />
+                    <File name="ProgramChangeMessage.cpp" />
                 </Folder>
                 <Folder name="ControlChangeMessage">
                     <File name="ControlChangeMessage.h" />
@@ -21,9 +21,15 @@
                 <File name="MidiConnection.h" />
                 <File name="MidiConnection.cpp" />
             </Folder>
+        </Folder>
+        <Folder name="Interface">
             <Folder name="MidiInterface">
                 <File name="MidiInterface.h" />
                 <File name="MidiInterface.cpp" />
+            </Folder>
+            <Folder name="AxeMessage">
+                <File name="AxeMessage.h" />
+                <File name="AxeMessage.cpp" />
             </Folder>
         </Folder>
         <Folder name="Controller">

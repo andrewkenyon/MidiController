@@ -61,5 +61,13 @@ namespace midi
 	{
 		return this->myControllerValue;
 	}
+	
+	
+	void ControlChangeMessage::sendMessage(MidiConnection* conn)
+	{
+		conn->sendCommand(CONTROL_CHANGE, this->myChannel);
+		conn->sendData(this->myControllerNumber);
+		conn->sendData(this->myControllerValue);
+	}
 }
 

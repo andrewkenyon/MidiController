@@ -19,7 +19,7 @@ namespace midi
 	FootController::FootController(MidiInterface* interface)
 	{
 		this->myInterface = interface;
-		  this->myBank = 0;
+		this->myBank = 0;
 		  
 		this->myLcd = new LiquidCrystal(7, 6, 5, 4, 3, 2);
 		this->myLcd->begin(LCD_COLUMNS,LCD_ROWS);

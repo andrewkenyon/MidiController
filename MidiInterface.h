@@ -3,13 +3,14 @@
  *  @brief      Interface between foot controller and midi I/O
  *  @version    0.1
  *  @author     Andrew Kenyon
- *  @date       17/01/2015
+ *  @date       18/05/2015
  */
  
 #pragma once
 
 #include "FootController.h"
 #include "MidiConnection.h"
+#include "SysExMessage.h"
 
 #include <Arduino.h>
 
@@ -63,7 +64,7 @@ namespace midi
       /****************************************/
       
       /* SysEx get and set message generation */
-	  std::vector<uint8_t>& generateHeader(const int vectorSize);
+	  void addHeader(SysExMessage* msg);
 	  void getFunction(const uint8_t function);
   
 	  void getParameter(const uint16_t& effect, const uint16_t&_tparameter);
@@ -108,8 +109,8 @@ namespace midi
        
       /****************************************/
       
-	  bool validateChecksum(const std::vector<uint8_t>& data);
-	  uint8_t generateChecksum(const std::vector<uint8_t>& data);
+	  bool validateChecksum(const std::vector<uint8_t>& data) const;
+	  void addChecksum(SysExMessage* msg);
       
       /****************************************/
       

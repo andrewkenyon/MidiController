@@ -9,6 +9,10 @@
  
 #include "MidiConnection.h"
 
+#include "ProgramChangeMessage.h"
+#include "ControlChangeMessage.h"
+#include "SysExMessage.h"
+
 using namespace std;
 
 namespace midi
@@ -45,33 +49,6 @@ namespace midi
   void MidiConnection::sendData(const uint8_t data) const
   {
     Serial.write(data);
-  }
-
-  /* Send program change without changing bank. */		
-  void MidiConnection::sendProgramChange(const ProgramChangeMessage& pc) const
-  {
-    this->sendCommand(PROGRAM_CHANGE, pc.getChannel());
-	this->sendData(pc.getProgram());
-  }
-  
-  void MidiConnection::sendControlChange(const ControlChangeMessage& cc) const
-  {
-	  this->sendCommand(CONTROL_CHANGE, cc.getChannel());
-	  this->sendData(cc.getControllerNumber());
-	  this->sendData(cc.getControllerValue());
-  }
-  
-  /* Send System Exclusive Message.
-  Should pass in with checksum if required, but not start or terminating byte. */
-  void MidiConnection::sendSysEx(const SysExMessage& sysEx) const
-  {
-    Serial.write(0xF0);
-	vector<uint8_t> data = sysEx.getData();
-    for(uint8_t i=0; i < data.size(); i++)
-    {
-      this->sendData(data.at(i));
-    }
-    Serial.write(0xF7);
   }
   
   /* Check the serial buffer and assemble a message if possible.
