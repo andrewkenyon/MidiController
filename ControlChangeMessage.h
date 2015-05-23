@@ -30,8 +30,6 @@ namespace midi
 		uint8_t getChannel() const;
 		uint8_t getControllerNumber() const;
 		uint8_t getControllerValue() const;
-		
-		void sendMessage(MidiConnection* conn);
 	};
 }
 

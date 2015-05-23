@@ -3,13 +3,10 @@
  *  @brief      Interface between foot controller and midi I/O
  *  @version    0.1
  *  @author     Andrew Kenyon
- *  @date       18/05/2015
+ *  @date       17/01/2015
  */
 
 #include "MidiInterface.h"
-#include "SysExMessage.h"
-#include "ProgramChangeMessage.h"
-#include "ControlChangeMessage.h"
 
 using namespace std;
 
@@ -51,6 +48,11 @@ namespace midi
   void MidiInterface::test(uint16_t testInt)
   {
     this->sendExtendedProgramChange(testInt);
+	/*ProgramChangeMessage pc((uint8_t)0);
+	if(pc.addData((uint8_t) testInt%128))
+	{
+		this->myConnection->sendProgramChange(pc);
+	}*/
     delay(100);
     
     this->update();
@@ -61,9 +63,8 @@ namespace midi
     //MIDI input
     while(this->myConnection->checkBuffer())
     {
-		MidiMessage* msg = this->myConnection->getMsg();
-		this->handleMsg(*msg);
-		delete msg;
+		const MidiMessage& msg = this->myConnection->getMsg();
+		this->handleMsg(msg);
     }
     
     //Foot controller input
@@ -98,37 +99,13 @@ namespace midi
   {
   	return sept0 + ((uint16_t)sept1 << 7);
   }
-  
-  /* Takes an unsigned 16-bit number and returns it as septets (MIDI uint8_ts).
-  Allows size to be set to 2 to allow conversion of numbers less than 14-bit to appropriately sized vector */
-  vector<uint8_t>* MidiInterface::getSeptetVector2(uint16_t num)
+
+  void MidiInterface::encodeForSysEx(uint16_t num, uint8_t bytes, SysExMessage* msg)
   {
-  	vector<uint8_t>* bvector = new vector<uint8_t>(2);
-  	addToSeptetVector2(num, bvector);
-        return bvector;
-  }
-  
-  /* Takes an unsigned 16-bit number and returns it as 3 (7/7/2) septets (MIDI uint8_ts). */
-  vector<uint8_t>* MidiInterface::getSeptetVector3(uint16_t num)
-  {
-  	vector<uint8_t>* bvector = new vector<uint8_t>(3);
-  	addToSeptetVector3(num, bvector);
-        return bvector;
-  }
-  
-  /* Adds an unsigned 14-bit number as 2 (7/7) septets (MIDI uint8_ts) to existing vector. */
-  void MidiInterface::addToSeptetVector2(uint16_t num, vector<uint8_t>* bvector)
-  {
-  	bvector->push_back(0x007F & num);
-  	bvector->push_back((0x3F80 & num) >> 7);
-  }  
-  
-  /* Adds an unsigned 16-bit number as 3 (7/7/2) septets (MIDI uint8_ts) to existing vector. */
-  void MidiInterface::addToSeptetVector3(uint16_t num, vector<uint8_t>* bvector)
-  {
-  	bvector->push_back(0x007F & num);
-  	bvector->push_back((0x3F80 & num) >> 7);
-  	bvector->push_back((0xC000 & num) >> 14);
+	  for(int i=0; i < bytes; i++)
+	  {
+		  msg->addData((num >> (i*7)) & 0x7F);
+	  }
   }
   
   String MidiInterface::extractString(const vector<uint8_t>& data, uint8_t start)
@@ -167,19 +144,19 @@ namespace midi
 	  ControlChangeMessage cc(this->myChannel);
 	  cc.addData((uint8_t)CC_BANKMSB);
 	  cc.addData(this->myBank);
-      cc.sendMessage(this->myConnection);
+      this->myConnection->sendControlChange(cc);
     }
 	ProgramChangeMessage pc(this->myChannel);
 	pc.addData((uint8_t)(extProgram % 128));
-    pc.sendMessage(this->myConnection);
+    this->myConnection->sendProgramChange(pc);
   }
   
   /*************************************************************************************************/
       
   /* SysEx get and set message generation */
   
-  void MidiInterface::addHeader(SysExMessage* msg)
-  {
+  void MidiInterface::generateHeader(SysExMessage* msg)
+  {  
     msg->addData(MAN_ID1);
     msg->addData(MAN_ID2);
     msg->addData(MAN_ID3);
@@ -189,118 +166,94 @@ namespace midi
   void MidiInterface::getFunction(uint8_t function)
   {
 	SysExMessage sysEx;
-    addHeader(&sysEx);
+	generateHeader(&sysEx);
     
     sysEx.addData(function); // Function ID
     
-    addChecksum(&sysEx);
-	
-	sysEx.sendMessage(this->myConnection);
+    generateChecksum(&sysEx);
+
+	this->myConnection->sendSysEx(sysEx);
   }
   
-  void MidiInterface::getParameter(const uint16_t& effect, const uint16_t& parameter)
-  {
-	SysExMessage sysEx;
-    addHeader(&sysEx);
+	void MidiInterface::getParameter(const uint16_t& effect, const uint16_t& parameter)
+	{	
+	  
+		SysExMessage sysEx;
+		generateHeader(&sysEx);
     
-    sysEx.addData(MIDI_PARAMETER); // Function ID
-    
-	vector<uint8_t> data;
-    addToSeptetVector2(effect, &data);
-    addToSeptetVector2(parameter, &data);
-    addToSeptetVector3(0, &data); //Get still requires arbitrary value as far as I can tell
-	
-	for(int i=0; i < data.size(); i++)
-	{
-		sysEx.addData(data.at(i));
-	}
-    
-    sysEx.addData(0x00); // 0 = query value
-    
-    addChecksum(&sysEx);
+		sysEx.addData(MIDI_PARAMETER); // Function ID
 
-	sysEx.sendMessage(this->myConnection);
-  }
+		encodeForSysEx(effect, 2, &sysEx);
+		encodeForSysEx(parameter, 2, &sysEx);
+		encodeForSysEx(0, 3, &sysEx); //Get still requires arbitrary value as far as I can tell
+
+		sysEx.addData(0x00); // 0 = query value
+    
+		generateChecksum(&sysEx);
+
+		this->myConnection->sendSysEx(sysEx);
+	}
   
-  void MidiInterface::setParameter(const uint16_t& effect, const uint16_t& parameter, const uint16_t& value)
-  {
-	SysExMessage sysEx;
-    addHeader(&sysEx);
+	void MidiInterface::setParameter(const uint16_t& effect, const uint16_t& parameter, const uint16_t& value)
+	{	
+	  	SysExMessage sysEx;
+		generateHeader(&sysEx);
     
-    sysEx.addData(MIDI_PARAMETER); // Function ID
-    
-	vector<uint8_t> data;
-    addToSeptetVector2(effect, &data);
-    addToSeptetVector2(parameter, &data);
-    addToSeptetVector3(value, &data);
+		sysEx.addData(MIDI_PARAMETER); // Function ID
 	
-	for(int i=0; i < data.size(); i++)
-	{
-		sysEx.addData(data.at(i));
+		encodeForSysEx(effect, 2, &sysEx);
+		encodeForSysEx(parameter, 2, &sysEx);
+		encodeForSysEx(value, 3, &sysEx);				
+    
+		sysEx.addData(0x01); // 1 = set value
+    
+		generateChecksum(&sysEx);
+		
+		this->myConnection->sendSysEx(sysEx);
 	}
-    
-    sysEx.addData(0x01); // 1 = set value
-    
-    addChecksum(&sysEx);
-
-	sysEx.sendMessage(this->myConnection);
-  }
   
-  void MidiInterface::getModifier(uint16_t effect, uint16_t parameter, uint8_t selector)
-  {
-	SysExMessage sysEx;
-    addHeader(&sysEx);
-    
-    sysEx.addData(MIDI_MODIFIER); // Function ID
-    	
-	vector<uint8_t> data;
-    addToSeptetVector2(effect, &data);
-    addToSeptetVector2(parameter, &data);
-    
-    data.push_back(selector);
-    data.push_back(0);
-    
-    addToSeptetVector3(0, &data); //Get still requires arbitrary value as far as I can tell
-	
-	for (int i = 0; i < data.size(); i++)
+	void MidiInterface::getModifier(uint16_t effect, uint16_t parameter, uint8_t selector)
 	{
-		sysEx.addData(data.at(i));
+	  	SysExMessage sysEx;
+		generateHeader(&sysEx);
+    
+		sysEx.addData(MIDI_MODIFIER); // Function ID
+    
+		vector<uint8_t> data;
+		encodeForSysEx(effect, 2, &sysEx);
+		encodeForSysEx(parameter, 2, &sysEx);
+		
+		sysEx.addData(selector);
+		sysEx.addData(0);
+		
+		encodeForSysEx(0, 3, &sysEx); //Get still requires arbitrary value as far as I can tell
+		
+		sysEx.addData(0x00); // 0 = query value
+		
+		generateChecksum(&sysEx);
+		
+		this->myConnection->sendSysEx(sysEx);
 	}
-    
-    sysEx.addData(0x00); // 0 = query value
-    
-    addChecksum(&sysEx);
-
-	sysEx.sendMessage(this->myConnection);
-  }
   
-  void MidiInterface::setModifier(uint16_t effect, uint16_t parameter, uint8_t selector, uint16_t value)
-  {
-	SysExMessage sysEx;
-    addHeader(&sysEx);
-    
-    sysEx.addData(MIDI_MODIFIER); // Function ID
-    
-	vector<uint8_t> data;
-    addToSeptetVector2(effect, &data);
-    addToSeptetVector2(parameter, &data);
-    
-    data.push_back(selector);
-    data.push_back(0);
-    
-    addToSeptetVector3(value, &data);
-	    
-	for (int i = 0; i < data.size(); i++)
+	void MidiInterface::setModifier(uint16_t effect, uint16_t parameter, uint8_t selector, uint16_t value)
 	{
-		sysEx.addData(data.at(i));
+	  	SysExMessage sysEx;
+		generateHeader(&sysEx);
+    
+		sysEx.addData(MIDI_MODIFIER); // Function ID
+    
+		encodeForSysEx(effect, 2, &sysEx);
+		encodeForSysEx(parameter, 2, &sysEx);
+		sysEx.addData(selector);
+		sysEx.addData(value);
+		encodeForSysEx(0, 3, &sysEx); //Get still requires arbitrary value as far as I can tell
+		
+		sysEx.addData(0x00); // 0 = query value
+		
+		generateChecksum(&sysEx);
+		
+		this->myConnection->sendSysEx(sysEx);
 	}
-    
-    sysEx.addData(0x01); // 1 = set value
-    
-    addChecksum(&sysEx);
-
-	sysEx.sendMessage(this->myConnection);
-  }
   
   void MidiInterface::getFirmwareVersion()
   {
@@ -325,9 +278,9 @@ namespace midi
   /* Set preset number using SysEx.
   Wiki is not very clear on this message, so may be wrong. */
   void MidiInterface::setPresetNumber()
-  {
+  {    
 	SysExMessage sysEx;
-    addHeader(&sysEx);
+    generateHeader(&sysEx);
     
     sysEx.addData(MIDI_PRESET_NUMBER);
     
@@ -336,9 +289,9 @@ namespace midi
     
     sysEx.addData(0x13); // Seems to be arbritary byte!
     
-    addChecksum(&sysEx);
+    generateChecksum(&sysEx);
 
-	sysEx.sendMessage(this->myConnection);
+	this->myConnection->sendSysEx(sysEx);
   }
   
   void MidiInterface::getGridRouting()
@@ -346,36 +299,36 @@ namespace midi
     getFunction(MIDI_GET_ROUTING_GRID_LAYOUT);
   }
   
-  void MidiInterface::enableLoopStatus(bool enable)
-  {
-	SysExMessage sysEx;
-    addHeader(&sysEx);
-    
-    sysEx.addData(MIDI_LOOPER_STATUS); // Function ID
+	void MidiInterface::enableLoopStatus(bool enable)
+	{
+		SysExMessage sysEx;
+		generateHeader(&sysEx);
+		
+		sysEx.addData(MIDI_LOOPER_STATUS); // Function ID
 
-    if(enable)  
-      sysEx.addData(0x01); // 1 = enable
-    else
-      sysEx.addData(0x00);
-      
-    addChecksum(&sysEx);
+		if(enable)  
+			sysEx.addData(0x01); // 1 = enable
+		else
+			sysEx.addData(0x00);
+		  
+		generateChecksum(&sysEx);
 
-	sysEx.sendMessage(this->myConnection);
-  }
+		this->myConnection->sendSysEx(sysEx);
+	}
   
     void MidiInterface::setSceneNumber(uint8_t scene)
-  {
-    SysExMessage sysEx;
-    addHeader(&sysEx);
-    
-    sysEx.addData(MIDI_SET_SCENE_NUMBER); // Function ID
-  
-    sysEx.addData(scene);
-      
-    addChecksum(&sysEx);
-    
-	sysEx.sendMessage(this->myConnection);
-  }
+	{
+		SysExMessage sysEx;
+		generateHeader(&sysEx);
+		
+		sysEx.addData(MIDI_SET_SCENE_NUMBER); // Function ID
+	  
+		sysEx.addData(scene);
+		  
+		generateChecksum(&sysEx);
+
+		this->myConnection->sendSysEx(sysEx);
+	}
   
   /*************************************************************************************************/
   
@@ -389,7 +342,7 @@ namespace midi
 		{
 			if ( (( ((ProgramChangeMessage&)msg).getChannel() ) == this->myChannel) || (this->myChannel == -1) )
 			{
-				return this->handleProgramChange(((ProgramChangeMessage&)msg).getProgram());
+				return this->handleProgramChange((ProgramChangeMessage&)msg);
 			}
 			else
 			{
@@ -400,7 +353,7 @@ namespace midi
 		{
 			if ( (( ((ControlChangeMessage&)msg).getChannel()) == this->myChannel) || (this->myChannel == -1) )
 			{
-				return this->handleControlChange(((ControlChangeMessage&)msg).getControllerNumber(), ((ControlChangeMessage&)msg).getControllerValue());
+				return this->handleControlChange((ControlChangeMessage&)msg);
 			}
 			else
 			{
@@ -409,7 +362,7 @@ namespace midi
 		}
 		case SYSTEM_MESSAGE:
 		{
-			return this->handleSysEx(((SysExMessage&)msg).getBody());
+			return this->handleSysEx((SysExMessage&)msg);
 		}
 		default:
 		{
@@ -418,25 +371,29 @@ namespace midi
 	}
   }
 
-  bool MidiInterface::handleProgramChange(uint8_t program)
+  bool MidiInterface::handleProgramChange(const ProgramChangeMessage& msg)
   {
-      this->myProgram = (uint16_t)((uint16_t)this->myBank*(uint16_t)128 + (uint16_t)program); //Calculate "extended" program number by taking into account the bank
+      this->myProgram = (uint16_t)((uint16_t)this->myBank*(uint16_t)128 + (uint16_t)msg.getProgram()); //Calculate "extended" program number by taking into account the bank
       this->myController->displayProgramNumber(this->myProgram);
       return true;
   }
 
-  bool MidiInterface::handleControlChange(uint8_t controller, uint8_t value)
+  bool MidiInterface::handleControlChange(const ControlChangeMessage& msg)
   {
-    if(controller == (uint8_t)CC_BANKMSB) //Bank change
+    if(msg.getControllerNumber() == (uint8_t)CC_BANKMSB) //Bank change
     {
-      this->myBank = value;
+      this->myBank = msg.getControllerValue();
       return true;
     }
-    return false;
+	else
+	{
+		return false;
+	}
   }
 
-  bool MidiInterface::handleSysEx(const vector<uint8_t>& data)
+  bool MidiInterface::handleSysEx(const SysExMessage& msg)
   {
+	  const vector<uint8_t>& data = msg.getData();
     //Check it has at least the bare minimum to be a meaningful SysEx message
     if(data.size() < 5)
     {
@@ -452,7 +409,7 @@ namespace midi
       return false;
     }
     
-    switch(data.at(4) /*Function ID */)
+    switch(data.at(4) /*Function ID*/ )
     {
       case MIDI_PARAMETER:                                         return this->handleParameter(data);
       case MIDI_MODIFIER:                                          return this->handleModifier(data); //Wiki says response to modifier is actually 0x02 (MIDI parameter), but I am assuming this is a mistake.
@@ -630,35 +587,26 @@ namespace midi
   /*************************************************************************************************/
     
   /* Not all functions have checksums */
- bool MidiInterface::validateChecksum(const vector<uint8_t>& data) const
-  {
-    //Assume checksum is the last uint8_t
-    uint8_t checksum = 0xF0;
-    for(uint8_t i=0; i < data.size()-1; i++) //Obviously don't include the actual checksum!
-    {
-      checksum ^= data.at(i);
-    }
-    return (checksum == data.back());
-  }  
+	bool MidiInterface::validateChecksum(const vector<uint8_t>& data)
+	{
+		uint8_t checksum = 0xF0;
+		for(uint8_t i=0; i < data.size()-1; i++)
+		{
+			checksum ^= data.at(i);
+		}
+		return (checksum == data.back());
+	}  
   
-  void MidiInterface::addChecksum(SysExMessage* msg)
-  {
-    uint8_t checksum = 0xF0;
-	
-	vector<uint8_t> manufacturer = msg->getManufacturer();
-    for(uint8_t i=0; i < manufacturer.size(); i++)
-    {
-      checksum ^= manufacturer.at(i);
-    }
-	
-	vector<uint8_t> body = msg->getBody();
-    for(uint8_t i=0; i < body.size(); i++)
-    {
-      checksum ^= body.at(i);
-    }
-	
-    msg->addData(checksum);    
-  }
+	void MidiInterface::generateChecksum(SysExMessage* msg)
+	{
+		uint8_t checksum = 0xF0;
+		const vector<uint8_t>& data = msg->getData();
+		for(uint8_t i=0; i < data.size(); i++)
+		{
+			checksum ^= data.at(i);
+		}
+		msg->addData(checksum);    
+	}
   
   /***************************************************************************************************/
   

@@ -12,8 +12,6 @@
 
 #include <Arduino.h>
 
-#include "MidiConnection.h"
-
 namespace midi
 {
 	#define NOTE_ON 0
@@ -32,24 +30,20 @@ namespace midi
 	#define INCOMPLETE 1 // Message is potentially valid, but needs (more) data.
 	#define COMPLETE 2 // Message is ready to pass to MidiInterface
 
-	class MidiConnection;
-	
-  class MidiMessage
-  {
-    protected:
-      uint8_t myType; // currently only PC, CC System message (only SysEx) support intended.
-      uint8_t myStatus; //INVALID, INCOMPLETE or COMPLETE
-      
-    public: 
-      MidiMessage(uint8_t type);
-      virtual ~MidiMessage();
-      
-      virtual bool addData(uint8_t newData) = 0;
-      
-	  uint8_t getType() const;
-	  uint8_t getStatus() const;
-	  
-	  virtual void sendMessage(MidiConnection* conn) = 0;
-  };
+	class MidiMessage
+	{
+		protected:
+			uint8_t myType; // currently only PC, CC System message (only SysEx) support intended.
+			uint8_t myStatus; //INVALID, INCOMPLETE or COMPLETE
+		  
+		public: 
+			MidiMessage();
+			MidiMessage(uint8_t type);
+
+			virtual bool addData(uint8_t newData);
+
+			uint8_t getType() const;
+			uint8_t getStatus() const;
+	};
 
 }

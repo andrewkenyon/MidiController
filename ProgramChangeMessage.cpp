@@ -9,11 +9,9 @@ namespace midi
 	ProgramChangeMessage::ProgramChangeMessage(uint8_t channel) : MidiMessage::MidiMessage(PROGRAM_CHANGE)
 	{
 		this->myChannel = channel;
+		this->myStatus = INCOMPLETE;
 	}
 
-	ProgramChangeMessage::~ProgramChangeMessage()
-	{
-	}
 	/* If it is appropriate add data byte to myData as appropriate for the type.
 	Update the status of the message accordingly */
 	bool ProgramChangeMessage::addData(const uint8_t newData)
@@ -33,20 +31,11 @@ namespace midi
 
 	uint8_t ProgramChangeMessage::getChannel() const
 	{
-		return this->getChannel();
+		return this->myChannel;
 	}
 
 	uint8_t ProgramChangeMessage::getProgram() const
 	{
 		return this->myProgram;
 	}
-	
-	
-	/* Send program change without changing bank. */		
-	void ProgramChangeMessage::sendMessage(MidiConnection* conn)
-	{
-		conn->sendCommand(PROGRAM_CHANGE, this->myChannel);
-		conn->sendData(this->myProgram);
-	}
-	
 }

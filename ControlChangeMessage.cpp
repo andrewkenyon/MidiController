@@ -49,7 +49,7 @@ namespace midi
 
 	uint8_t ControlChangeMessage::getChannel() const
 	{
-		return this->getChannel();
+		return this->myChannel;
 	}
 
 	uint8_t ControlChangeMessage::getControllerNumber() const
@@ -60,14 +60,6 @@ namespace midi
 	uint8_t ControlChangeMessage::getControllerValue() const
 	{
 		return this->myControllerValue;
-	}
-	
-	
-	void ControlChangeMessage::sendMessage(MidiConnection* conn)
-	{
-		conn->sendCommand(CONTROL_CHANGE, this->myChannel);
-		conn->sendData(this->myControllerNumber);
-		conn->sendData(this->myControllerValue);
 	}
 }
 

@@ -21,14 +21,11 @@ namespace midi
 
 	public:
 		ProgramChangeMessage(uint8_t channel);
-		~ProgramChangeMessage();
 
 		uint8_t getChannel() const;
 		bool addData(uint8_t newData);
 
 		uint8_t getProgram() const;
-		
-		void sendMessage(MidiConnection* conn);
 	};
 }
 

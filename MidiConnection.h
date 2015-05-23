@@ -8,14 +8,14 @@
  
 #pragma once
 
-#include "MidiMessage.h"
+#include "ProgramChangeMessage.h"
+#include "ControlChangeMessage.h"
+#include "SysExMessage.h"
 
 #include <Arduino.h>
 
 namespace midi
 {  
-	class MidiMessage;
-
   class MidiConnection
   {
     private: 
@@ -24,10 +24,15 @@ namespace midi
     public: 
       MidiConnection();
 	  ~MidiConnection();
+
+	  void sendProgramChange(const ProgramChangeMessage& pc) const;
+	  void sendControlChange(const ControlChangeMessage& cc) const;
+	  void sendSysEx(const SysExMessage& sysEx) const;
 	  
 	  bool checkBuffer();
-      MidiMessage* getMsg();
-	  
+      const MidiMessage& getMsg();
+			
+    private: 
       void sendCommand(const uint8_t command, const uint8_t channelOrSubtype) const;
       void sendData(const uint8_t data) const;	
   };

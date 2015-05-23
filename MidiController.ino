@@ -8,7 +8,7 @@
  *  @brief      Main file for Arduino MIDI controller.
  *  @version    0.1
  *  @author     Andrew Kenyon
- *  @date       15/01/2015
+ *  @date       21/05/2015
  */
 
 #include <vector>

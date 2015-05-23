@@ -9,34 +9,25 @@
  
 #include "MidiConnection.h"
 
-#include "ProgramChangeMessage.h"
-#include "ControlChangeMessage.h"
-#include "SysExMessage.h"
-
 using namespace std;
 
 namespace midi
 {
   //Default constructor
 	MidiConnection::MidiConnection()
+	{
+		this->myMsg = new MidiMessage();
+		Serial.begin(31250);
+	}
+
+  const MidiMessage& MidiConnection::getMsg()
   {
-	  this->myMsg = NULL;
-	  Serial.begin(31250);
+	  return *this->myMsg;
   }
-		
+  
   MidiConnection::~MidiConnection()
   {
-	  if (this->myMsg != NULL)
-	  {
-		  delete this->myMsg;
-	  }
-  }
-
-  MidiMessage* MidiConnection::getMsg()
-  {
-	  MidiMessage* returnPtr = this->myMsg;
-	  this->myMsg = NULL;
-	  return returnPtr;
+	  delete this->myMsg;
   }
   
   /* Send raw command byte (0x80-0xFF), first bit is always set to 1 */
@@ -50,6 +41,33 @@ namespace midi
   {
     Serial.write(data);
   }
+
+  /* Send program change without changing bank. */		
+  void MidiConnection::sendProgramChange(const ProgramChangeMessage& pc) const
+  {
+    this->sendCommand(PROGRAM_CHANGE, pc.getChannel());
+	this->sendData(pc.getProgram());
+  }
+  
+  void MidiConnection::sendControlChange(const ControlChangeMessage& cc) const
+  {
+	  this->sendCommand(CONTROL_CHANGE, cc.getChannel());
+	  this->sendData(cc.getControllerNumber());
+	  this->sendData(cc.getControllerValue());
+  }
+  
+  /* Send System Exclusive Message.
+  Should pass in with checksum if required, but not start or terminating byte. */
+  void MidiConnection::sendSysEx(const SysExMessage& sysEx) const
+  {
+    Serial.write(0xF0);
+	const vector<uint8_t>& data = sysEx.getData();
+    for(uint8_t i=0; i < data.size(); i++)
+    {
+      this->sendData(data.at(i));
+    }
+    Serial.write(0xF7);
+  }
   
   /* Check the serial buffer and assemble a message if possible.
   getMsg() must be called in order to get message.
@@ -58,44 +76,45 @@ namespace midi
   {
     while(Serial.available())
     {
-      byte msg = Serial.read();
+		byte msg = Serial.read();
       
-      if((msg >> 7)) //msg is a command
-      {
-
-        uint8_t type = (msg >> 4) & 0x7;
-        uint8_t secondHalf = msg & 0x0F;
-      
-        /*SysEx is actually a subtype of system messages. 
-        The type (bits 2-4) is really for system msg (7), requiring the usual "channel" bits to select 0 for SysEx. 
-        We do not support the other types, but must still check and disregard if not 0xF0 
-		(This is now done in MidiInterface, to keep MidiConnection as generic as possible.*/
-
-		switch (this->myMsg->getType())
+		if((msg >= 0x80)) //msg is a command
 		{
-			case CONTROL_CHANGE:
-				this->myMsg = new ControlChangeMessage(secondHalf);
-				break;
-			case PROGRAM_CHANGE:
-				this->myMsg = new ProgramChangeMessage(secondHalf);
-				break;
-			case SYSTEM_MESSAGE:
-				if (secondHalf == 0x0) //SysEx
-					this->myMsg = new SysExMessage();
-				break;
-			default:
-				break;
+			delete this->myMsg;//new message, so clear old message
+			
+			uint8_t type = (msg >> 4) & 0x7;
+			uint8_t secondHalf = msg & 0x0F;
+		  
+			/*SysEx is actually a subtype of system messages. 
+			The type (bits 2-4) is really for system msg (7), requiring the usual "channel" bits to select 0 for SysEx. 
+			We do not support the other types, but must still check and disregard if not 0xF0 */
+
+			switch (type)
+			{
+				case CONTROL_CHANGE:
+					this->myMsg = new ControlChangeMessage(secondHalf);
+					break;
+				case PROGRAM_CHANGE:
+					this->myMsg = new ProgramChangeMessage(secondHalf);
+					break;
+				case SYSTEM_MESSAGE:
+					if (secondHalf == 0x0) //SysEx
+						this->myMsg = new SysExMessage();
+					break;
+				default:
+					this->myMsg = new MidiMessage(type); //Invalid message, but store anyway.
+					break;
+			}
 		}
-      }
-      else
-      {
-        this->myMsg->addData(msg);
-      }
+		else
+		{
+			this->myMsg->addData(msg);
+		}
         
-      if(this->myMsg->getStatus() == COMPLETE)
-      {
-        return true;
-      }
+		if(this->myMsg->getStatus() == COMPLETE)
+		{
+			return true;
+		}
     }
     return false;
   }
