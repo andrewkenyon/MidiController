@@ -32,6 +32,10 @@
         <Folder name="Controller">
             <File name="FootController.h" />
             <File name="FootController.cpp" />
+            <Folder name="AxeController">
+                <File name="AxeController.cpp" />
+                <File name="AxeController.h" />
+            </Folder>
             <Folder name="Footswitch">
                 <File name="Footswitch.h" />
                 <File name="Footswitch.cpp" />
