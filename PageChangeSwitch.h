@@ -3,7 +3,7 @@
 #ifndef _PAGECHANGESWITCH_h
 #define _PAGECHANGESWITCH_h
 
-#include "Footswitch.h"
+#include "AxeController.h"
 
 #if defined(ARDUINO) && ARDUINO >= 100
 	#include "Arduino.h"
@@ -14,10 +14,13 @@
 namespace midi
 {
 	//Specific implementations for each type of switch
-	class PageChangeSwitch : public Footswitch
+	class PageChangeSwitch : public FootSwitch
 	{
+	private:
+		AxeController* myFootController;
+		
 	public:
-		PageChangeSwitch(FootController* ctrl);
+		PageChangeSwitch(AxeController* ctrl);
 		~PageChangeSwitch();
 
 	private:

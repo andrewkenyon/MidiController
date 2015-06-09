@@ -3,15 +3,16 @@
  *  @brief      Handles changing to IA or looper pages.
  *  @version    0.1
  *  @author     Andrew Kenyon
- *  @date       10/05/2015
+ *  @date       09/06/2015
  */
 
 #include "PageChangeSwitch.h"
 
 namespace midi
 {    
-  PageChangeSwitch::PageChangeSwitch(FootController* ctrl) : Footswitch(ctrl)
+  PageChangeSwitch::PageChangeSwitch(AxeController* ctrl) : FootSwitch()
   {
+	  this->myFootController = ctrl;
   }
   
   PageChangeSwitch::~PageChangeSwitch()

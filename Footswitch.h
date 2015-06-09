@@ -1,5 +1,5 @@
 /*!
- *  @file       Footswitch.h
+ *  @file       FootSwitch.h
  *  @brief      Handles footswitch I/0. Currently also includes associated LED
  *  @version    0.1
  *  @author     Andrew Kenyon
@@ -22,16 +22,15 @@ namespace midi
 	class FootController;
 
   /* General abstract class to represent footswitch common functionality */
-  class Footswitch
+  class FootSwitch
   {
 	  public:
-		Footswitch(FootController* ctrl);
-		virtual ~Footswitch();
+		FootSwitch();
+		virtual ~FootSwitch();
 	  
     protected:
       int16_t myCurrentPress; //Negative value means not pressed
       uint8_t myLedState; //Currently just on and off.
-	  FootController* myFootController;
           
 	private:
       virtual bool handlePress(uint16_t duration) = 0;

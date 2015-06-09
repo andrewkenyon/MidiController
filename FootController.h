@@ -8,8 +8,7 @@
  
 #pragma once
 
-#include "MidiInterface.h"
-#include "Footswitch.h"
+#include "FootSwitch.h"
 
 #include <vector>
 
@@ -18,43 +17,18 @@
 
 namespace midi
 {
-	#define LCD_COLUMNS 16
-	#define LCD_ROWS 2
-
-	#define SWITCHES 8
-	#define BANK_SIZE 5
-
-	#define PAGE_PRESETS 0
-	#define PAGE_IA 1
-	#define PAGE_LOOPER 2
-	
-	class Footswitch;
-	class MidiInterface;
+	class FootSwitch;
 
 	class FootController
 	{
-	private:
-		MidiInterface* myInterface;
+	protected:
 		LiquidCrystal* myLcd;
-		std::vector<Footswitch*> mySwitches;
+		std::vector<FootSwitch*> mySwitches;
 		uint8_t myPage;
 		uint8_t myBank; //Not the same as the MIDI bank!
       
 	public:
-		FootController(MidiInterface* interface);
-		~FootController();
-
-		void displayProgramNumber(uint16_t programNumber);
-		void displayProgramName(String programName);
-
-		int displayBpm(int tempo);
-		void displayTempoPulse(bool pulse);
-      
-		void displayTuner(String note, uint8_t string, uint8_t cents);
-      
-		std::vector<int16_t> updateFootswitches();
-		void updateLeds(std::vector<uint8_t> states);
-		
-		void changeProgramWithinBank(uint8_t preset);
+		FootController();
+		virtual ~FootController();
 	};
 }

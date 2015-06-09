@@ -8,7 +8,7 @@
  
 #pragma once
 
-#include "FootController.h"
+#include "AxeController.h"
 #include "MidiConnection.h"
 
 #include <Arduino.h>
@@ -18,13 +18,13 @@ namespace midi
 	#define GRID_COLUMNS 12
 	#define GRID_ROWS 4
 	
-	class FootController;
+	class AxeController;
 
 	class MidiInterface
 	{
 		private:
 			MidiConnection* myConnection;
-			FootController* myController;
+			AxeController* myController;
 
 			int8_t myChannel = -1;
       

@@ -7,6 +7,7 @@
  */
 
 #include "MidiInterface.h"
+#include "AxeController.h"
 
 using namespace std;
 
@@ -15,7 +16,7 @@ namespace midi
   MidiInterface::MidiInterface(int8_t channel)
   {
 	this->myConnection = new MidiConnection();
-	this->myController = new FootController(this);
+	this->myController = new AxeController(this);
 	this->myChannel = channel;
     
     this->myProgram = 0;
@@ -28,7 +29,7 @@ namespace midi
   MidiInterface::MidiInterface()
   {
 	this->myConnection = new MidiConnection();
-	this->myController = new FootController(this);
+	this->myController = new AxeController(this);
 	  this->myChannel = -1; //Listen to all
 
 	  this->myProgram = 0;

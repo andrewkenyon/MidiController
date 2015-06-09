@@ -1,9 +1,16 @@
-// SelectSwitch.h
+/*!
+ *  @file       TempoTunerSwitch.h
+ *  @brief      Handles tempo and tuner switch I/0.
+ *  @version    0.1
+ *  @author     Andrew Kenyon
+ *  @date       09/06/2015
+ */
+
 
 #ifndef _TEMPOTUNERSWITCH_h
 #define _TEMPOTUNERSWITCH_h
 
-#include "Footswitch.h"
+#include "AxeController.h"
 
 #if defined(ARDUINO) && ARDUINO >= 100
 	#include "Arduino.h"
@@ -14,14 +21,17 @@
 namespace midi
 {
 	//Specific implementations for each type of switch
-	class TempoTunerSwitch : public Footswitch
+	class TempoTunerSwitch : public FootSwitch
 	{
-	public:
-		TempoTunerSwitch(FootController* ctrl);
-		~TempoTunerSwitch();
+		private:
+			AxeController* myFootController;
+			
+		public:
+			TempoTunerSwitch(AxeController* ctrl);
+			~TempoTunerSwitch();
 
-	private:
-		bool handlePress(uint16_t duration);
+		private:
+			bool handlePress(uint16_t duration);
 	};
 }
 

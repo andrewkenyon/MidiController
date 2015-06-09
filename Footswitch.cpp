@@ -1,5 +1,5 @@
 /*!
- *  @file       Footswitch.cpp
+ *  @file       FootSwitch.cpp
  *  @brief      Handles footswitch I/0. Currently also includes associated LED
  *  @version    0.1
  *  @author     Andrew Kenyon
@@ -10,20 +10,19 @@
 
 namespace midi
 {  
-	Footswitch::Footswitch(FootController* ctrl)
+	FootSwitch::FootSwitch()
 	{
-		this->myFootController = ctrl;
 		this->myCurrentPress = -1;
 		this->myLedState = 0;
 	}
 	
-	Footswitch::~Footswitch()
+	FootSwitch::~FootSwitch()
 	{
 		
 	}
   
   // Updates current press. When switch is released sends length of button press
-  int16_t Footswitch::updateFootswitch(bool pressed)
+  int16_t FootSwitch::updateFootswitch(bool pressed)
   {
     if(pressed && (this->myCurrentPress < 0))
     {
@@ -40,7 +39,7 @@ namespace midi
   }
   
   /* LED state. Only in sofware */
-  void Footswitch::updateLed(uint8_t state)
+  void FootSwitch::updateLed(uint8_t state)
   {
     this->myLedState = state;
   }
