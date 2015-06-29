@@ -40,7 +40,7 @@ namespace midi
   /* Displays preset number in top left of LCD.
  Accepts int, so can accept larger values than the actual MIDI program 
  limit of 128 (MidiInterface uses bank changes to get around this). */
-  void AxeController::displayProgramNumber(uint16_t programNumber)
+  void AxeController::displayPresetNumber(uint16_t programNumber)
   {
     this->myLcd->setCursor(0, 0);
     int position = this->myLcd->print("Pre ");

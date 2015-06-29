@@ -30,6 +30,32 @@ namespace midi
 	  delete this->myMsg;
   }
   
+  bool MidiConnection::sendMessage(const MidiMessage& msg) const
+  {
+	switch (msg.getType())
+	{
+		case PROGRAM_CHANGE:
+		{
+			this->sendProgramChange((ProgramChangeMessage&)msg);
+			return true;
+		}
+		case CONTROL_CHANGE:
+		{
+			this->sendControlChange((ControlChangeMessage&)msg);
+			return true;
+		}
+		case SYSTEM_MESSAGE:
+		{
+			this->sendSysEx((SysExMessage&)msg);
+			return true;
+		}
+		default:
+		{
+			return false;
+		}
+	}
+  }
+  
   /* Send raw command byte (0x80-0xFF), first bit is always set to 1 */
   void MidiConnection::sendCommand(const uint8_t command, const uint8_t channelOrSubtype) const
   {

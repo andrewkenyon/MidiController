@@ -1,6 +1,5 @@
 <NotepadPlus>
     <Project name="MidiController">
-        <File name="MidiController.ino" />
         <Folder name="Midi">
             <Folder name="MidiMessage">
                 <File name="MidiMessage.h" />
@@ -24,17 +23,26 @@
             </Folder>
         </Folder>
         <Folder name="Interface">
+            <File name="SysExDefs.h" />
             <Folder name="MidiInterface">
                 <File name="MidiInterface.h" />
                 <File name="MidiInterface.cpp" />
+            </Folder>
+            <Folder name="MessageHandler">
+                <File name="MessageHandler.h" />
+                <File name="MessageHandler.cpp" />
+            </Folder>
+            <Folder name="MessageFactory">
+                <File name="MessageFactory.h" />
+                <File name="MessageFactory.cpp" />
             </Folder>
         </Folder>
         <Folder name="Controller">
             <File name="FootController.h" />
             <File name="FootController.cpp" />
             <Folder name="AxeController">
-                <File name="AxeController.cpp" />
                 <File name="AxeController.h" />
+                <File name="AxeController.cpp" />
             </Folder>
             <Folder name="Footswitch">
                 <File name="Footswitch.h" />
@@ -57,5 +65,6 @@
                 </Folder>
             </Folder>
         </Folder>
+        <File name="MidiController.ino" />
     </Project>
 </NotepadPlus>

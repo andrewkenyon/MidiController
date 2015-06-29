@@ -3,21 +3,19 @@
  *  @brief      Interface between foot controller and midi I/O
  *  @version    0.1
  *  @author     Andrew Kenyon
- *  @date       17/01/2015
+ *  @date       29/06/2015
  */
  
 #pragma once
 
+#include "SysExDefs.h"
 #include "AxeController.h"
 #include "MidiConnection.h"
 
 #include <Arduino.h>
 
 namespace midi
-{
-	#define GRID_COLUMNS 12
-	#define GRID_ROWS 4
-	
+{	
 	class AxeController;
 
 	class MidiInterface
@@ -28,8 +26,8 @@ namespace midi
 
 			int8_t myChannel = -1;
       
-			uint16_t myProgram;
-			uint8_t myBank; //The midi bank (CC #0) currently used. //Allow negative values to represent unknown starting state
+			uint8_t myProgram; //Program 0-127, in combination with bank, preset up to 14-bit number (~16000).
+			uint8_t myBank; //The midi bank (CC #0) currently used.
       
 			int myTempo; //Tempo in bpm
 			unsigned long myPreviousTempoPulse;
@@ -42,28 +40,28 @@ namespace midi
 			void test(const uint16_t testInt);
 			void update();
 
-			int getProgram();
-			int getBank();
+			uint16_t getPreset();
+			int8_t getChannel();
+			
+			bool setProgram(uint8_t programChange);
+			bool setBank(uint8_t bankChange);
 				
 			void sendExtendedProgramChange(const uint16_t extProgram);
-				
-			static uint16_t processSeptets(const uint8_t sept0, const uint8_t sept1, const uint8_t sept2);
-			static uint16_t processSeptets(const uint8_t sept0, const uint8_t sept1);	  
-			
-			static String extractString(const std::vector<uint8_t>& data, const uint8_t start);
       
-		private:         
-			void updateTempo();
+	  
+		public:
+			void updateTempo();			
+		private:       
 			void pulseTempo();
 		  
 		  /****************************************/
 		  
 		  /* SysEx get and set message generation */
 		  
+		private:
 		  	static void encodeForSysEx(const uint16_t num, const uint8_t bytes, SysExMessage* msg);
 					
 			static void generateHeader(SysExMessage* msg);			
-
 			
 			void getFunction(const uint8_t function);
 	  
@@ -88,29 +86,7 @@ namespace midi
 			void setSceneNumber(const uint8_t scene);
 
 		  /****************************************/
-
-			/* Handle Messages */
-			
-			bool handleMsg(const MidiMessage& msg);
-			bool handleProgramChange(const ProgramChangeMessage& msg);
-			bool handleControlChange(const ControlChangeMessage& msg);
-			bool handleSysEx(const SysExMessage& msg);
-
-			bool handleParameter(const std::vector<uint8_t>& data);
-			bool handleModifier(const std::vector<uint8_t>& data);
-			bool handleFirmwareVersion(const std::vector<uint8_t>& data);
-			bool handleTunerInfo(const std::vector<uint8_t>& data);
-			bool handlePresetState(const std::vector<uint8_t>& data);
-			bool handlePresetName(const std::vector<uint8_t>& data);
-			bool handleTempoBeat();
-			bool handlePresetNumber(const std::vector<uint8_t>& data);
-			bool handleGridRouting(const std::vector<uint8_t>& data);
-			bool handleLooperStatus(const std::vector<uint8_t>& data);
-			bool handleSceneNumber(const std::vector<uint8_t>& data);
-
-		  /****************************************/
 		  
-			bool validateChecksum(const std::vector<uint8_t>& data);
 			void generateChecksum(SysExMessage* msg);
 		  
 		  /****************************************/

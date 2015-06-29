@@ -19,21 +19,23 @@ namespace midi
   class MidiConnection
   {
     private: 
-      MidiMessage* myMsg;
+		MidiMessage* myMsg;
 		
     public: 
-      MidiConnection();
-	  ~MidiConnection();
+		MidiConnection();
+		~MidiConnection();
 
-	  void sendProgramChange(const ProgramChangeMessage& pc) const;
-	  void sendControlChange(const ControlChangeMessage& cc) const;
-	  void sendSysEx(const SysExMessage& sysEx) const;
-	  
-	  bool checkBuffer();
-      const MidiMessage& getMsg();
+		bool sendMessage(const MidiMessage& msg) const;
+
+		bool checkBuffer();
+		const MidiMessage& getMsg();
 			
-    private: 
-      void sendCommand(const uint8_t command, const uint8_t channelOrSubtype) const;
-      void sendData(const uint8_t data) const;	
+    private:
+		void sendProgramChange(const ProgramChangeMessage& pc) const;
+		void sendControlChange(const ControlChangeMessage& cc) const;
+		void sendSysEx(const SysExMessage& sysEx) const;
+		
+		void sendCommand(const uint8_t command, const uint8_t channelOrSubtype) const;
+		void sendData(const uint8_t data) const;	
   };
 }

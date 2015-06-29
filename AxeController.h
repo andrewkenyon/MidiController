@@ -39,7 +39,7 @@ namespace midi
 		AxeController(MidiInterface* interface);
 		
 		
-		void displayProgramNumber(uint16_t programNumber);
+		void displayPresetNumber(uint16_t programNumber);
 		void displayProgramName(String programName);
 
 		int displayBpm(int tempo);
