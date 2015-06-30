@@ -36,6 +36,10 @@
                 <File name="MessageFactory.h" />
                 <File name="MessageFactory.cpp" />
             </Folder>
+            <Folder name="FootSwitchHandler">
+                <File name="FootSwitchHandler.h" />
+                <File name="FootSwitchHandler.cpp" />
+            </Folder>
         </Folder>
         <Folder name="Controller">
             <File name="FootController.h" />
@@ -44,9 +48,9 @@
                 <File name="AxeController.h" />
                 <File name="AxeController.cpp" />
             </Folder>
-            <Folder name="Footswitch">
-                <File name="Footswitch.h" />
-                <File name="Footswitch.cpp" />
+            <Folder name="FootSwitch">
+                <File name="FootSwitch.h" />
+                <File name="FootSwitch.cpp" />
                 <Folder name="BankSwitch">
                     <File name="BankSwitch.h" />
                     <File name="BankSwitch.cpp" />

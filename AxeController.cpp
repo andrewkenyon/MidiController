@@ -1,9 +1,9 @@
 /*!
- *  @file       FootController.cpp
+ *  @file       AxeController.cpp
  *  @brief      Handles user I/O (LCD, switches and LEDs)
  *  @version    0.1
  *  @author     Andrew Kenyon
- *  @date       10/05/2015
+ *  @date       30/06/2015
  */
 
 #include "AxeController.h"
@@ -161,7 +161,7 @@ namespace midi
   
 	void AxeController::changeProgramWithinBank(uint8_t preset)
 	{
-		this->myInterface->sendExtendedProgramChange(this->myBank*BANK_SIZE + preset);
+		this->myInterface->changePreset(this->myBank*BANK_SIZE + preset);
 	}	
 		
 }

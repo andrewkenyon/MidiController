@@ -25,6 +25,7 @@ namespace midi
 			if (newData == 0x7F)
 			{
 				this->myStatus = COMPLETE;
+				this->myNextByte = this->myData.begin();
 			}
 			else
 			{
@@ -42,6 +43,5 @@ namespace midi
 	{
 		return this->myData;
 	}
-
 
 }

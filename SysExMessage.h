@@ -24,6 +24,7 @@ namespace midi
 
 	private:
 		std::vector<uint8_t> myData;
+		std::vector<uint8_t>::iterator myNextByte;
 
 	public:
 		SysExMessage();

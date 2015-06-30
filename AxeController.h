@@ -1,9 +1,9 @@
 /*!
- *  @file       FootController.h
+ *  @file       AxeController.h
  *  @brief      Handles user I/O (LCD, switches and LEDs)
  *  @version    0.1
  *  @author     Andrew Kenyon
- *  @date       10/05/2015
+ *  @date       30/06/2015
  */
  
 #pragma once

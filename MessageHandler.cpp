@@ -59,8 +59,8 @@ namespace midi
 
 	bool MessageHandler::handleProgramChange(const ProgramChangeMessage& msg)
 	{
-		this->myInterface->setProgram(msg.getProgram());
-		this->myController->displayPresetNumber(this->myInterface->getPreset());
+		this->myInterface->myProgram = msg.getProgram();
+		this->myController->displayPresetNumber(this->myInterface->myProgram);
 		return true;
 	}
 
@@ -68,7 +68,7 @@ namespace midi
 	{
 		if(msg.getControllerNumber() == (uint8_t)CC_BANKMSB) //Bank change
 		{
-			this->myInterface->setBank(msg.getControllerValue());
+			this->myInterface->myBank = msg.getControllerValue();
 			return true;
 		}
 		else
@@ -254,8 +254,8 @@ namespace midi
 	{
 		if(validateChecksum(data))
 		{
-			this->myInterface->setBank(data.at(5));
-			this->myInterface->setProgram(data.at(6));
+			this->myInterface->myBank = data.at(5);
+			this->myInterface->myProgram = data.at(6);
 			this->myController->displayPresetNumber(processSeptets(data.at(5), data.at(6)));
 			return true;
 		}

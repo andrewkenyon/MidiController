@@ -3,7 +3,7 @@
  *  @brief      MIDI connection for Arduino MIDI controller.
  *  @version    0.1
  *  @author     Andrew Kenyon
- *  @date       15/01/2015
+ *  @date       30/06/2015
  */
  
 #pragma once
@@ -16,26 +16,26 @@
 
 namespace midi
 {  
-  class MidiConnection
-  {
-    private: 
-		MidiMessage* myMsg;
-		
-    public: 
-		MidiConnection();
-		~MidiConnection();
-
-		bool sendMessage(const MidiMessage& msg) const;
-
-		bool checkBuffer();
-		const MidiMessage& getMsg();
+	class MidiConnection
+	{	  
+		private: 
+			MidiMessage* myMsg;
 			
-    private:
-		void sendProgramChange(const ProgramChangeMessage& pc) const;
-		void sendControlChange(const ControlChangeMessage& cc) const;
-		void sendSysEx(const SysExMessage& sysEx) const;
-		
-		void sendCommand(const uint8_t command, const uint8_t channelOrSubtype) const;
-		void sendData(const uint8_t data) const;	
-  };
+		public: 
+			MidiConnection();
+			~MidiConnection();
+
+			bool sendMessage(const MidiMessage& msg) const;
+
+			bool checkBuffer();
+			const MidiMessage& getMsg() const;
+				
+		private:
+			void sendProgramChange(const ProgramChangeMessage& pc) const;
+			void sendControlChange(const ControlChangeMessage& cc) const;
+			void sendSysEx(const SysExMessage& sysEx) const;
+			
+			void sendCommand(const uint8_t command, const uint8_t channelOrSubtype) const;
+			void sendData(const uint8_t data) const;	
+	};
 }
