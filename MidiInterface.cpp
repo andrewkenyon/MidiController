@@ -12,6 +12,8 @@
 #include "MessageHandler.h"
 #include "MessageFactory.h"
 
+#include "FootSwitchHandler.h"
+
 using namespace std;
 
 namespace midi
@@ -68,12 +70,14 @@ namespace midi
 		while(this->myConnection->checkBuffer())
 		{
 			const MidiMessage& msg = this->myConnection->getMsg();
-			MessageHandler handler(this, this->myController);
+			MessageHandler handler(this, &this->myBank, &this->myProgram, this->myController);
 			handler.handleMsg(msg);
 		}
     
 		//Foot controller input
-		//this->myController->updateLeds(this->handleFootswitches(this->myController->updateFootswitches()));
+		FootSwitchHandler handler(this, this->myController);
+		vector<uint8_t> results = handler.handleFootswitches(this->myController->updateFootswitches());
+		this->myController->updateLeds(results);
 		
 		//MIDI output
 		
@@ -94,7 +98,7 @@ namespace midi
 	/* Sets preset regardless of whether the message is recieved by downstream devices */
 	void MidiInterface::changePreset(uint16_t preset)
 	{
-		MessageFactory factory(this);
+		MessageFactory factory(this, &this->myBank, &this->myProgram);
 		
 		if(this->myBank != (uint8_t)(preset/(uint16_t)128))
 		{

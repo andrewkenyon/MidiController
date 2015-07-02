@@ -34,10 +34,12 @@ namespace midi
 	{
 	private:
 		MidiInterface* myInterface;
-      
+		
+	private:
+		AxeController();
 	public:
 		AxeController(MidiInterface* interface);
-		
+		~AxeController();
 		
 		void displayPresetNumber(uint16_t programNumber);
 		void displayProgramName(String programName);

@@ -5,7 +5,13 @@
 #include "ControlChangeMessage.h"
 
 namespace midi
-{
+{	
+ControlChangeMessage::ControlChangeMessage() : MidiMessage::MidiMessage(CONTROL_CHANGE)
+	{
+		this->myChannel = -1;
+		this->myDataCounter = 0;
+	}
+
 	ControlChangeMessage::ControlChangeMessage(uint8_t channel) : MidiMessage::MidiMessage(CONTROL_CHANGE)
 	{
 		this->myChannel = channel;
@@ -18,7 +24,7 @@ namespace midi
 
 	/* If it is appropriate add data byte to myData as appropriate for the type.
 	Update the status of the message accordingly */
-	bool ControlChangeMessage::addData(uint8_t newData)
+	bool ControlChangeMessage::addData(const uint8_t& newData)
 	{
 		if (this->myStatus == INCOMPLETE)
 		{

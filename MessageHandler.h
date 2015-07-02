@@ -18,10 +18,16 @@ namespace midi
 	{
 		private:
 			MidiInterface* myInterface;
+			uint8_t* myBank;
+			uint8_t* myProgram;
+			
 			AxeController* myController;
       
+		private:
+			MessageHandler();
 		public:
-			MessageHandler(MidiInterface* interface, AxeController* controller);
+			MessageHandler(MidiInterface* interface, uint8_t* bank, uint8_t* program, AxeController* controller);
+			~MessageHandler();
 			
 		/************* Handle Messages ***************/
 		

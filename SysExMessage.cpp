@@ -18,14 +18,13 @@ namespace midi
 
 	/* If it is appropriate add data byte to myData as appropriate for the type.
 	Update the status of the message accordingly */
-	bool SysExMessage::addData(uint8_t newData)
+	bool SysExMessage::addData(const uint8_t& newData)
 	{
 		if (this->myStatus == INCOMPLETE)
 		{
 			if (newData == 0x7F)
 			{
 				this->myStatus = COMPLETE;
-				this->myNextByte = this->myData.begin();
 			}
 			else
 			{

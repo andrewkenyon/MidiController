@@ -22,16 +22,15 @@ namespace midi
 	class SysExMessage : public MidiMessage
 	{
 
-	private:
-		std::vector<uint8_t> myData;
-		std::vector<uint8_t>::iterator myNextByte;
+		private:
+			std::vector<uint8_t> myData;
 
-	public:
-		SysExMessage();
-		~SysExMessage();
+		public:
+			SysExMessage();
+			virtual ~SysExMessage();
 
-		bool addData(uint8_t newData);
-		const std::vector<uint8_t>& getData() const;
+			virtual bool addData(const uint8_t& newData);
+			const std::vector<uint8_t>& getData() const;
 	};
 }
 

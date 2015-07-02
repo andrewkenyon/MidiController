@@ -14,20 +14,25 @@
 #include <Arduino.h>
 
 namespace midi
-{	
+{
 	class MessageFactory
 	{
 		private:
 			MidiInterface* myInterface;
+			uint8_t* myBank;
+			uint8_t* myProgram;
 			
+		private:
+			MessageFactory(); //disallow default contructor
 		public:
-			MessageFactory(MidiInterface* interface);
+			MessageFactory(MidiInterface* interface, uint8_t* bank, uint8_t* program);
+			~MessageFactory();
 			
 			/***********************************************************/
 			
 		public:
-			const MidiMessage programChange(uint8_t program) const;
-			const MidiMessage bankChange(uint8_t bank) const;
+			const ProgramChangeMessage programChange(uint8_t program) const;
+			const ControlChangeMessage bankChange(uint8_t bank) const;
 		  
 			/************ SysEx get and set message generation *********/
 		  
@@ -39,27 +44,27 @@ namespace midi
 		/****************************************/
 		
 		public:		
-			void getFunction(const uint8_t function);
+			SysExMessage getFunction(const uint8_t function);
 	  
-			void getParameter(const uint16_t& effect, const uint16_t&_tparameter);
-			void setParameter(const uint16_t& effect, const uint16_t& parameter, const uint16_t& value);
+			SysExMessage getParameter(const uint16_t& effect, const uint16_t&_tparameter);
+			SysExMessage setParameter(const uint16_t& effect, const uint16_t& parameter, const uint16_t& value);
 		  
-			void getModifier(const uint16_t effect, const uint16_t parameter, const uint8_t selector);
-			void setModifier(const uint16_t effect, const uint16_t parameter, const uint8_t selector, const uint16_t value);
+			SysExMessage getModifier(const uint16_t effect, const uint16_t parameter, const uint8_t selector);
+			SysExMessage setModifier(const uint16_t effect, const uint16_t parameter, const uint8_t selector, const uint16_t value);
 
-			void getFirmwareVersion();
+			SysExMessage getFirmwareVersion();
 
-			void getPresetState();
+			SysExMessage getPresetState();
 
-			void getPresetName();
-			void getPresetNumber();
-			void changePresetNumber();
+			SysExMessage getPresetName();
+			SysExMessage getPresetNumber();
+			SysExMessage changePresetNumber();
 
-			void getGridRouting();
+			SysExMessage getGridRouting();
 
-			void enableLoopStatus(const bool enable);
+			SysExMessage enableLoopStatus(const bool enable);
 
-			void setSceneNumber(const uint8_t scene);
+			SysExMessage setSceneNumber(const uint8_t scene);
 
 
 	};

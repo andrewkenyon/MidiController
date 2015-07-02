@@ -13,19 +13,22 @@
 
 namespace midi
 {
+	class MidiMessage;
+	
 	class ControlChangeMessage : public MidiMessage
 	{
 	private:
-		uint8_t myChannel; //Channel message was recieved on. For System messages this is actually the sub-type (e.g. SysEx).
+		int8_t myChannel; //Channel message was recieved on. For System messages this is actually the sub-type (e.g. SysEx).
 		uint8_t myControllerNumber;
 		uint8_t myControllerValue;
 		uint8_t myDataCounter;
 
 	public:
+		ControlChangeMessage();
 		ControlChangeMessage(uint8_t channel);
-		~ControlChangeMessage();
+		virtual ~ControlChangeMessage();
 
-		bool addData(uint8_t newData);
+		virtual bool addData(const uint8_t& newData);
 
 		uint8_t getChannel() const;
 		uint8_t getControllerNumber() const;

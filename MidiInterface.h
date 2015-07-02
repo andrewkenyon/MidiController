@@ -20,9 +20,6 @@ namespace midi
 
 	class MidiInterface
 	{
-		friend class MessageHandler;
-		friend class MessageFactory;
-		
 		private:
 			MidiConnection* myConnection;
 			AxeController* myController;
@@ -55,6 +52,3 @@ namespace midi
 		 
 	};
 }
-    
-
-

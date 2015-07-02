@@ -12,23 +12,29 @@ using namespace std;
 
 namespace midi
 {    	
-	MessageFactory::MessageFactory(MidiInterface* interface)
+	MessageFactory::MessageFactory(MidiInterface* interface, uint8_t* bank, uint8_t* program)
 	{
 		this->myInterface = interface;
+		this->myBank = bank;
+		this->myProgram = program;
+	}
+	
+	MessageFactory::~MessageFactory()
+	{
 	}
 	
 	/**************************************************************/
 	
-	const MidiMessage MessageFactory::programChange(uint8_t program) const
+	const ProgramChangeMessage MessageFactory::programChange(uint8_t program) const
 	{
-		ProgramChangeMessage pc(this->myInterface->myChannel);
+		ProgramChangeMessage pc(this->myInterface->getChannel());
 		pc.addData(program);
 		return pc;
 	}	
 	
-	const MidiMessage MessageFactory::bankChange(uint8_t bank) const
+	const ControlChangeMessage MessageFactory::bankChange(uint8_t bank) const
 	{
-		ControlChangeMessage cc(this->myInterface->myChannel);
+		ControlChangeMessage cc(this->myInterface->getChannel());
 		cc.addData((uint8_t)CC_BANKMSB);
 		cc.addData(bank);
 		return cc;
@@ -65,7 +71,7 @@ namespace midi
   
 	/************************************************************************************/
     
-	void MessageFactory::getFunction(uint8_t function)
+	SysExMessage MessageFactory::getFunction(uint8_t function)
 	{
 		SysExMessage sysEx;
 		generateHeader(&sysEx);
@@ -74,10 +80,10 @@ namespace midi
 		
 		generateChecksum(&sysEx);
 
-		this->myInterface->myConnection->sendMessage(sysEx);
+		return sysEx;
 	}	
 	
-	void MessageFactory::getParameter(const uint16_t& effect, const uint16_t& parameter)
+	SysExMessage MessageFactory::getParameter(const uint16_t& effect, const uint16_t& parameter)
 	{	
 	  
 		SysExMessage sysEx;
@@ -93,10 +99,10 @@ namespace midi
     
 		generateChecksum(&sysEx);
 
-		this->myInterface->myConnection->sendMessage(sysEx);
+		return sysEx;
 	}
   
-	void MessageFactory::setParameter(const uint16_t& effect, const uint16_t& parameter, const uint16_t& value)
+	SysExMessage MessageFactory::setParameter(const uint16_t& effect, const uint16_t& parameter, const uint16_t& value)
 	{	
 	  	SysExMessage sysEx;
 		generateHeader(&sysEx);
@@ -111,10 +117,10 @@ namespace midi
     
 		generateChecksum(&sysEx);
 		
-		this->myInterface->myConnection->sendMessage(sysEx);
+		return sysEx;
 	}
   
-	void MessageFactory::getModifier(uint16_t effect, uint16_t parameter, uint8_t selector)
+	SysExMessage MessageFactory::getModifier(uint16_t effect, uint16_t parameter, uint8_t selector)
 	{
 	  	SysExMessage sysEx;
 		generateHeader(&sysEx);
@@ -134,10 +140,10 @@ namespace midi
 		
 		generateChecksum(&sysEx);
 		
-		this->myInterface->myConnection->sendMessage(sysEx);
+		return sysEx;
 	}
   
-	void MessageFactory::setModifier(uint16_t effect, uint16_t parameter, uint8_t selector, uint16_t value)
+	SysExMessage MessageFactory::setModifier(uint16_t effect, uint16_t parameter, uint8_t selector, uint16_t value)
 	{
 	  	SysExMessage sysEx;
 		generateHeader(&sysEx);
@@ -154,53 +160,53 @@ namespace midi
 		
 		generateChecksum(&sysEx);
 		
-		this->myInterface->myConnection->sendMessage(sysEx);
+		return sysEx;
 	}
   
-	void MessageFactory::getFirmwareVersion()
+	SysExMessage MessageFactory::getFirmwareVersion()
 	{
-		getFunction(MIDI_GET_FIRMWARE_VERSION);
+		return getFunction(MIDI_GET_FIRMWARE_VERSION);
 	}
   
-	void MessageFactory::getPresetState()
+	SysExMessage MessageFactory::getPresetState()
 	{
-		getFunction(MIDI_GET_PRESET_EFFECT_BLOCKS_AND_CC_AND_BYPASS_STATE);
+		return getFunction(MIDI_GET_PRESET_EFFECT_BLOCKS_AND_CC_AND_BYPASS_STATE);
 	}
   
-	void MessageFactory::getPresetName()
+	SysExMessage MessageFactory::getPresetName()
 	{
-		getFunction(MIDI_GET_PRESET_NAME);
+		return getFunction(MIDI_GET_PRESET_NAME);
 	}
   
-	void MessageFactory::getPresetNumber()
+	SysExMessage MessageFactory::getPresetNumber()
 	{
-		getFunction(MIDI_PRESET_NUMBER);
+		return getFunction(MIDI_PRESET_NUMBER);
 	}
   
 	/* Set preset number using SysEx. Wiki is not very clear on this message, so may be wrong. */
-	void MessageFactory::changePresetNumber()
+	SysExMessage MessageFactory::changePresetNumber()
 	{    
 		SysExMessage sysEx;
 		generateHeader(&sysEx);
 		
 		sysEx.addData(MIDI_PRESET_NUMBER);
 		
-		sysEx.addData(this->myInterface->myBank);
-		sysEx.addData(this->myInterface->myProgram);
+		sysEx.addData(*this->myBank);
+		sysEx.addData(*this->myProgram);
 		
 		sysEx.addData(0x13); // Seems to be arbritary byte!
 		
 		generateChecksum(&sysEx);
 
-		this->myInterface->myConnection->sendMessage(sysEx);
+		return sysEx;
 	}
   
-	void MessageFactory::getGridRouting()
+	SysExMessage MessageFactory::getGridRouting()
 	{
-		getFunction(MIDI_GET_ROUTING_GRID_LAYOUT);
+		return getFunction(MIDI_GET_ROUTING_GRID_LAYOUT);
 	}
   
-	void MessageFactory::enableLoopStatus(bool enable)
+	SysExMessage MessageFactory::enableLoopStatus(bool enable)
 	{
 		SysExMessage sysEx;
 		generateHeader(&sysEx);
@@ -214,10 +220,10 @@ namespace midi
 		  
 		generateChecksum(&sysEx);
 
-		this->myInterface->myConnection->sendMessage(sysEx);
+		return sysEx;
 	}
   
-    void MessageFactory::setSceneNumber(uint8_t scene)
+    SysExMessage MessageFactory::setSceneNumber(uint8_t scene)
 	{
 		SysExMessage sysEx;
 		generateHeader(&sysEx);
@@ -228,7 +234,7 @@ namespace midi
 		  
 		generateChecksum(&sysEx);
 
-		this->myInterface->myConnection->sendMessage(sysEx);
+		return sysEx;
 	}
 
 }

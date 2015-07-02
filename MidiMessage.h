@@ -33,16 +33,20 @@ namespace midi
 	class MidiMessage
 	{
 		protected:
-			uint8_t myType; // currently only PC, CC System message (only SysEx) support intended.
+			const int8_t myType; // currently only PC, CC System message (only SysEx) support intended. -1 represents not set (can never be a valid message)
 			uint8_t myStatus; //INVALID, INCOMPLETE or COMPLETE
 		  
-		public: 
+		private:
 			MidiMessage();
+		protected: 
 			MidiMessage(uint8_t type);
+		public:
+			virtual ~MidiMessage();
 
-			virtual bool addData(uint8_t newData);
+		public:
+			virtual bool addData(const uint8_t& newData) = 0;
 
-			uint8_t getType() const;
+			virtual int8_t getType() const;
 			uint8_t getStatus() const;
 	};
 

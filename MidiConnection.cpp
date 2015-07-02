@@ -16,9 +16,10 @@ namespace midi
 	//Default constructor
 	MidiConnection::MidiConnection()
 	{
-		this->myMsg = new MidiMessage();
+		this->myMsg = NULL;
 		Serial.begin(31250);
 	}
+
 
 	MidiConnection::~MidiConnection()
 	{
@@ -31,12 +32,10 @@ namespace midi
 	{
 		while(Serial.available())
 		{
-			byte msg = Serial.read();
+			uint8_t msg = Serial.read();
 		  
 			if((msg >= 0x80)) //msg is a command
-			{
-				delete this->myMsg;//new message, so clear old message
-				
+			{				
 				uint8_t type = (msg >> 4) & 0x7;
 				uint8_t secondHalf = msg & 0x0F;
 			  
@@ -44,24 +43,38 @@ namespace midi
 				The type (bits 2-4) is really for system msg (7), requiring the usual "channel" bits to select 0 for SysEx. 
 				We do not support the other types, but must still check and disregard if not 0xF0 */
 
-				switch (type)
+				switch(type)
 				{
-					case CONTROL_CHANGE:
+					case CONTROL_CHANGE:	
+					{
+						delete this->myMsg;//new message, so clear old message
 						this->myMsg = new ControlChangeMessage(secondHalf);
 						break;
+					}
 					case PROGRAM_CHANGE:
+					{
+						delete this->myMsg;//new message, so clear old message
 						this->myMsg = new ProgramChangeMessage(secondHalf);
 						break;
+					}
 					case SYSTEM_MESSAGE:
+					{
 						if (secondHalf == 0x0) //SysEx
+						{							
+							delete this->myMsg;//new message, so clear old message
 							this->myMsg = new SysExMessage();
+						}
 						break;
+					}
 					default:
-						this->myMsg = new MidiMessage(type); //Invalid message, but store anyway.
+					{
+						delete this->myMsg;
+						this->myMsg = NULL; //Invalid message, but store anyway.
 						break;
+					}
 				}
 			}
-			else
+			else if (this->myMsg != NULL)
 			{
 				this->myMsg->addData(msg);
 			}

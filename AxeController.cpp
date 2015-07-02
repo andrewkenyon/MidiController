@@ -35,6 +35,10 @@ namespace midi
 
 		this->myPage = PAGE_PRESETS;
 	}
+	
+	AxeController::~AxeController()
+	{
+	}
 		
 	
   /* Displays preset number in top left of LCD.
