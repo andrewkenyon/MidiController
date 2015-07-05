@@ -21,7 +21,14 @@ namespace midi
   
   bool BankSwitch::handlePress(uint16_t duration)
   {
-    // TODO
+    if(duration >= LONG_PRESS)
+	{
+		this->myFootController->bankDown();
+	}
+	else
+	{
+		this->myFootController->bankUp();
+	}
     return true;
   }
   

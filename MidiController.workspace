@@ -36,10 +36,6 @@
                 <File name="MessageFactory.h" />
                 <File name="MessageFactory.cpp" />
             </Folder>
-            <Folder name="FootSwitchHandler">
-                <File name="FootSwitchHandler.h" />
-                <File name="FootSwitchHandler.cpp" />
-            </Folder>
         </Folder>
         <Folder name="Controller">
             <File name="FootController.h" />

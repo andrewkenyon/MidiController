@@ -11,8 +11,6 @@
 #include "FootController.h"
 #include "MidiInterface.h"
 
-#include <vector>
-
 #include <LiquidCrystal.h>
 #include <Arduino.h>
 
@@ -41,6 +39,7 @@ namespace midi
 		AxeController(MidiInterface* interface);
 		~AxeController();
 		
+	public:
 		void displayPresetNumber(uint16_t programNumber);
 		void displayProgramName(String programName);
 
@@ -49,9 +48,16 @@ namespace midi
       
 		void displayTuner(String note, uint8_t string, uint8_t cents);
       
-		std::vector<int16_t> updateFootswitches();
-		void updateLeds(std::vector<uint8_t> states);
+		void updateFootswitches();
 		
+	private:
+		void refreshLeds();
+		
+		/*********************************************/
+	
+	public:
 		void changeProgramWithinBank(uint8_t preset);
+		void bankUp();
+		void bankDown();
 	};
 }

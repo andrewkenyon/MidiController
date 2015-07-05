@@ -3,7 +3,7 @@
  *  @brief      Handles tempo and tuner switch I/0.
  *  @version    0.1
  *  @author     Andrew Kenyon
- *  @date       09/06/2015
+ *  @date       03/07/2015
  */
 
 
@@ -24,10 +24,11 @@ namespace midi
 	class TempoTunerSwitch : public FootSwitch
 	{
 		private:
-			AxeController* myFootController;
+			AxeController* myController;
+			MidiInterface* myInterface;
 			
 		public:
-			TempoTunerSwitch(AxeController* ctrl);
+			TempoTunerSwitch(MidiInterface* interface);
 			~TempoTunerSwitch();
 
 		private:

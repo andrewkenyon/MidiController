@@ -3,7 +3,7 @@
  *  @brief      Interface between foot controller and midi I/O
  *  @version    0.1
  *  @author     Andrew Kenyon
- *  @date       30/06/2015
+ *  @date       03/07/2015
  */
 
 #include "MidiInterface.h"
@@ -11,8 +11,6 @@
 
 #include "MessageHandler.h"
 #include "MessageFactory.h"
-
-#include "FootSwitchHandler.h"
 
 using namespace std;
 
@@ -29,6 +27,11 @@ namespace midi
 		  
 		this->myTempo = 60; 
 		this->myPreviousTempoPulse = millis();
+		this->myTappedTempo = vector<long>(2);
+		this->myTappedTempo.at(0) = -67;
+		this->myTappedTempo.at(0) = -1;
+		
+		this->myTunerMode = false;
 	}
   
 	MidiInterface::MidiInterface()
@@ -42,6 +45,11 @@ namespace midi
 
 		this->myTempo = 60;
 		this->myPreviousTempoPulse = millis();
+		this->myTappedTempo = vector<long>(2);
+		this->myTappedTempo.at(0) = -67;
+		this->myTappedTempo.at(0) = -1;
+		
+		this->myTunerMode = false;
 	}
 
 	MidiInterface::~MidiInterface()
@@ -67,6 +75,7 @@ namespace midi
 	void MidiInterface::update()
 	{
 		//MIDI input
+		//TODO Add ability to sift through messages while in tuner mode
 		while(this->myConnection->checkBuffer())
 		{
 			const MidiMessage& msg = this->myConnection->getMsg();
@@ -75,9 +84,7 @@ namespace midi
 		}
     
 		//Foot controller input
-		FootSwitchHandler handler(this, this->myController);
-		vector<uint8_t> results = handler.handleFootswitches(this->myController->updateFootswitches());
-		this->myController->updateLeds(results);
+		this->myController->updateFootswitches();
 		
 		//MIDI output
 		
@@ -121,6 +128,18 @@ namespace midi
 		this->myController->displayBpm(myTempo);
 
 	}
+	
+	/* Update tempo from footswitch input */
+	void MidiInterface::tapTempo(long currentTap)
+	{
+		this->myTappedTempo.at(0) = this->myTappedTempo.at(1);
+		this->myTappedTempo.at(1) = currentTap;
+		if((this->myTappedTempo.at(0) > 0) && (this->myTappedTempo.at(1) > 0))
+		{
+			// TODO send new tempo to axe fx
+		}
+		
+	}
   
 	/* Clears tempo "!" mark if half way through pulses, 
 	in order to show as 50/50 on/off pulse */
@@ -135,5 +154,12 @@ namespace midi
 		{
 			this->myController->displayTempoPulse(true);
 		}
+	}
+	
+	bool MidiInterface::toggleTunerMode()
+	{
+		this->myTunerMode = !this->myTunerMode;
+		
+		return this->myTunerMode;
 	}
 }

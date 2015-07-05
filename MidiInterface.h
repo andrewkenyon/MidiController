@@ -31,6 +31,9 @@ namespace midi
       
 			int myTempo; //Tempo in bpm
 			unsigned long myPreviousTempoPulse;
+			std::vector<long> myTappedTempo;
+			
+			bool myTunerMode;
       
 		public:
 			MidiInterface(const int8_t channel);
@@ -44,11 +47,14 @@ namespace midi
 			int8_t getChannel() const;
 
 			void changePreset(uint16_t preset);
-	  
-		public:
+			
 			void updateTempo();			
+			void tapTempo(long currentTap);
 		private:       
 			void pulseTempo();
+			
+		public:
+			bool toggleTunerMode();
 		 
 	};
 }

@@ -3,7 +3,7 @@
  *  @brief      Handles footswitch I/0. Currently also includes associated LED
  *  @version    0.1
  *  @author     Andrew Kenyon
- *  @date       18/02/2015
+ *  @date       03/07/2015
  */
  
 #pragma once
@@ -37,8 +37,9 @@ namespace midi
 	  
 		public:
 			int16_t updateFootswitch(bool pressed); //Updates current press.
-			void updateLed(uint8_t state);     
+			void setLedState(uint8_t state);     
+			uint8_t getLedState();
 
-  };
+	};
  
 }
