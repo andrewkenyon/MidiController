@@ -12,11 +12,10 @@ using namespace std;
 
 namespace midi
 {    
-	MessageHandler::MessageHandler(MidiInterface* interface, uint8_t* bank, uint8_t* program, AxeController* controller)
+	MessageHandler::MessageHandler(MidiInterface* interface, const uint8_t bank, AxeController* controller)
 	{
 		this->myInterface = interface;
 		this->myBank = bank;
-		this->myProgram = program;
 		
 		this->myController = controller;
 	}
@@ -66,8 +65,7 @@ namespace midi
 
 	bool MessageHandler::handleProgramChange(const ProgramChangeMessage& msg)
 	{
-		*this->myProgram = msg.getProgram();
-		this->myController->displayPresetNumber(*this->myProgram);
+		this->myInterface->changePreset(this->myBank*128 + msg.getProgram(), false);
 		return true;
 	}
 
@@ -75,7 +73,10 @@ namespace midi
 	{
 		if(msg.getControllerNumber() == (uint8_t)CC_BANKMSB) //Bank change
 		{
-			*this->myBank = msg.getControllerValue();
+			if(this->myBank != msg.getControllerValue())
+			{
+				this->myBank = msg.getControllerValue();
+			}
 			return true;
 		}
 		else
@@ -261,9 +262,7 @@ namespace midi
 	{
 		if(validateChecksum(data))
 		{
-			*this->myBank = data.at(5);
-			*this ->myProgram = data.at(6);
-			this->myController->displayPresetNumber(processSeptets(data.at(5), data.at(6)));
+			this->myInterface->changePreset(processSeptets(data.at(5), data.at(6)), false);
 			return true;
 		}
 		else

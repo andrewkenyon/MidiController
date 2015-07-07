@@ -61,7 +61,7 @@ namespace midi
 	//TODO
 	void MidiInterface::test(uint16_t testInt)
 	{
-		this->changePreset(testInt);
+		this->changePreset(testInt, true);
 		/*ProgramChangeMessage pc((uint8_t)0);
 		if(pc.addData((uint8_t) testInt%128))
 		{
@@ -79,7 +79,7 @@ namespace midi
 		while(this->myConnection->checkBuffer())
 		{
 			const MidiMessage& msg = this->myConnection->getMsg();
-			MessageHandler handler(this, &this->myBank, &this->myProgram, this->myController);
+			MessageHandler handler(this, this->myBank, this->myController);
 			handler.handleMsg(msg);
 		}
     
@@ -103,18 +103,25 @@ namespace midi
 	}	
 	
 	/* Sets preset regardless of whether the message is recieved by downstream devices */
-	void MidiInterface::changePreset(uint16_t preset)
+	void MidiInterface::changePreset(const uint16_t preset, const bool transmit)
 	{
-		MessageFactory factory(this, &this->myBank, &this->myProgram);
+		MessageFactory factory(this, this->myBank, this->myProgram);
 		
 		if(this->myBank != (uint8_t)(preset/(uint16_t)128))
 		{
 			this->myBank = (uint8_t)(preset/(uint16_t)128);
-			this->myConnection->sendMessage(factory.bankChange(this->myBank));
+			if(transmit)
+			{
+				this->myConnection->sendMessage(factory.bankChange(this->myBank));
+			}
 		}
 		
 		this->myProgram = (uint8_t)(preset % 128);
-		this->myConnection->sendMessage(factory.programChange(this->myProgram));
+		if(transmit)
+		{
+			this->myConnection->sendMessage(factory.programChange(this->myProgram));
+		}
+		this->myController->displayPresetNumber(this->myBank*128 + this->myProgram);
 	}
 
 	/***********************************************************/

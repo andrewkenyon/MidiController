@@ -46,7 +46,7 @@ namespace midi
 			uint16_t getPreset() const;
 			int8_t getChannel() const;
 
-			void changePreset(uint16_t preset);
+			void changePreset(const uint16_t preset, const bool transmit);
 			
 			void updateTempo();			
 			void tapTempo(long currentTap);

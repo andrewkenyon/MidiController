@@ -12,7 +12,7 @@ using namespace std;
 
 namespace midi
 {    	
-	MessageFactory::MessageFactory(MidiInterface* interface, uint8_t* bank, uint8_t* program)
+	MessageFactory::MessageFactory(MidiInterface* interface, const uint8_t bank, const uint8_t program)
 	{
 		this->myInterface = interface;
 		this->myBank = bank;
@@ -191,8 +191,8 @@ namespace midi
 		
 		sysEx.addData(MIDI_PRESET_NUMBER);
 		
-		sysEx.addData(*this->myBank);
-		sysEx.addData(*this->myProgram);
+		sysEx.addData(this->myBank);
+		sysEx.addData(this->myProgram);
 		
 		sysEx.addData(0x13); // Seems to be arbritary byte!
 		

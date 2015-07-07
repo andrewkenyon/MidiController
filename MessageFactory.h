@@ -19,13 +19,13 @@ namespace midi
 	{
 		private:
 			MidiInterface* myInterface;
-			uint8_t* myBank;
-			uint8_t* myProgram;
+			uint8_t myBank;
+			uint8_t myProgram;
 			
 		private:
 			MessageFactory(); //disallow default contructor
 		public:
-			MessageFactory(MidiInterface* interface, uint8_t* bank, uint8_t* program);
+			MessageFactory(MidiInterface* interface, uint8_t bank, uint8_t program);
 			~MessageFactory();
 			
 			/***********************************************************/

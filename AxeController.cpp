@@ -166,7 +166,7 @@ namespace midi
   
 	void AxeController::changeProgramWithinBank(uint8_t preset)
 	{
-		this->myInterface->changePreset(this->myBank*BANK_SIZE + preset);
+		this->myInterface->changePreset(this->myBank*BANK_SIZE + preset, true);
 	}	
 	
 	void AxeController::bankUp()

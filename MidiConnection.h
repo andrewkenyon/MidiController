@@ -23,11 +23,11 @@ namespace midi
 			
 		public: 
 			MidiConnection();
-			~MidiConnection();
+			virtual ~MidiConnection();
 
 			bool sendMessage(const MidiMessage& msg) const;
 
-			bool checkBuffer();
+			virtual bool checkBuffer();
 			const MidiMessage& getMsg() const;
 				
 		private:
