@@ -87,162 +87,111 @@ namespace midi
 
 	bool MessageHandler::handleSysEx(const SysExMessage& msg)
 	{
-		const vector<uint8_t>& data = msg.getData();
 		//Check it has at least the bare minimum to be a meaningful SysEx message
-		if(data.size() < 5)
+		if(msg.payloadSize() < 5)
 		{
 			return false;
 		}
     
 		//Check header matches
-		if( (data.at(0) != MAN_ID1) || (data.at(1) != MAN_ID2) || (data.at(2) != MAN_ID3) || (data.at(3) != MODEL_ID) )
+		if( (msg.payloadAt(0) != MAN_ID1) || (msg.payloadAt(1) != MAN_ID2) || (msg.payloadAt(2) != MAN_ID3) || (msg.payloadAt(3) != MODEL_ID) )
 		{
 			return false;
 		}
     
-		switch(data.at(4) /*Function ID*/ )
+		switch(msg.payloadAt(4) /*Function ID*/ )
 		{
-			case MIDI_PARAMETER:                                         return this->handleParameter(data);
-			case MIDI_MODIFIER:                                          return this->handleModifier(data); //Wiki says response to modifier is 0x02 (MIDI parameter); I am assuming this is a mistake.
-			case MIDI_GET_FIRMWARE_VERSION:                              return this->handleFirmwareVersion(data);
-			case MIDI_TUNER_INFO:                                        return this->handleTunerInfo(data);
-			case MIDI_GET_PRESET_EFFECT_BLOCKS_AND_CC_AND_BYPASS_STATE:  return this->handlePresetState(data);
-			case MIDI_GET_PRESET_NAME:                                   return this->handlePresetName(data);
+			case MIDI_PARAMETER:                                         return this->handleParameter(msg);
+			case MIDI_MODIFIER:                                          return this->handleModifier(msg); //Wiki says response to modifier is 0x02 (MIDI parameter); I am assuming this is a mistake.
+			case MIDI_GET_FIRMWARE_VERSION:                              return this->handleFirmwareVersion(msg);
+			case MIDI_TUNER_INFO:                                        return this->handleTunerInfo(msg);
+			case MIDI_GET_PRESET_EFFECT_BLOCKS_AND_CC_AND_BYPASS_STATE:  return this->handlePresetState(msg);
+			case MIDI_GET_PRESET_NAME:                                   return this->handlePresetName(msg);
 			case MIDI_TEMPO_BEAT:                                        return this->handleTempoBeat();
-			case MIDI_PRESET_NUMBER:                                     return this->handlePresetNumber(data);
-			case MIDI_GET_ROUTING_GRID_LAYOUT:                           return this->handleGridRouting(data);
-			case MIDI_LOOPER_STATUS:                                     return this->handleLooperStatus(data);
-			case MIDI_SET_SCENE_NUMBER:                                  return this->handleSceneNumber(data);
+			case MIDI_PRESET_NUMBER:                                     return this->handlePresetNumber(msg);
+			case MIDI_GET_ROUTING_GRID_LAYOUT:                           return this->handleGridRouting(msg);
+			case MIDI_LOOPER_STATUS:                                     return this->handleLooperStatus(msg);
+			case MIDI_SET_SCENE_NUMBER:                                  return this->handleSceneNumber(msg);
 			default:                                                     return false;
 		}
 	}
-  
-	
-	bool MessageHandler::handleGridRouting(const vector<uint8_t>& data)
-	{
-		uint8_t effects[GRID_COLUMNS][GRID_ROWS];
-		bool routing[GRID_COLUMNS][GRID_ROWS][GRID_ROWS];
-	 
-		for(uint8_t column=0; column < GRID_COLUMNS; column++)
-		{
-			for(uint8_t row=0; row < GRID_ROWS; row++)
-			{
-				effects[column][row] = processSeptets(data.at(5+(column*GRID_ROWS)+row),data.at(6+(column*GRID_ROWS)+row));
-        
-				for(uint8_t input=0; input < GRID_ROWS; input++)
-				{
-					routing[column][row][input] = (0x01 << input) & data.at(7+(column*GRID_ROWS)+row);
-				}
-			}
-		}
-    
-		//TODO: Do something with this information
-		return validateChecksum(data);
-	}
-  
-      
-	bool MessageHandler::handleLooperStatus(const vector<uint8_t>& data)
-	{
-		bool record = 0x01 & data.at(5); //Bit 0: Record
-		bool play = 0x02 & data.at(5); //Bit 1: Play
-		bool once = 0x04 & data.at(5); //Bit 2: Once
-		bool overdub = 0x08 & data.at(5); //Bit 3: Overdub
-		bool reverse = 0x10 & data.at(5); //Bit 4: Reverse
-		bool half = 0x20 & data.at(5); //Bit 5: Half
-		bool undo = 0x40 & data.at(5); //Bit 6: Undo
-    
-		uint8_t range = data.at(6);
 
-		//TODO Do something with info
-    
-		return validateChecksum(data);
-	}
-  
-	bool MessageHandler::handleSceneNumber(const vector<uint8_t>& data)
+	bool MessageHandler::handleParameter(const SysExMessage& msg)
 	{
-		uint8_t scene = data.at(5);
-
-		//TODO Do something with info
-    
-		return validateChecksum(data);
-	}
-  
-	bool MessageHandler::handleParameter(const vector<uint8_t>& data)
-	{
-		uint16_t effect = processSeptets(data.at(5), data.at(6));
-		uint16_t parameter = processSeptets(data.at(7), data.at(8));
-		uint16_t value = processSeptets(data.at(9), data.at(10), data.at(11));    
+		uint16_t effect = processSeptets(msg.payloadAt(5), msg.payloadAt(6));
+		uint16_t parameter = processSeptets(msg.payloadAt(7), msg.payloadAt(8));
+		uint16_t value = processSeptets(msg.payloadAt(9), msg.payloadAt(10), msg.payloadAt(11));    
 		
 		//Not sure what bytes 12-16 do!!!
 		
-		String text = extractString(data, 17);
+		String text = extractString(msg, 17);
 		
 		// TODO: Do something with this information...
 		
-		return validateChecksum(data);
+		return validateChecksum(msg);
 	}	
   
-	bool MessageHandler::handleModifier(const vector<uint8_t>& data)
+	bool MessageHandler::handleModifier(const SysExMessage& msg)
 	{
-		uint16_t effect = processSeptets(data.at(5), data.at(6));
-		uint16_t parameter = processSeptets(data.at(7), data.at(8));
-		uint8_t selector = data.at(9);
+		uint16_t effect = processSeptets(msg.payloadAt(5), msg.payloadAt(6));
+		uint16_t parameter = processSeptets(msg.payloadAt(7), msg.payloadAt(8));
+		uint8_t selector = msg.payloadAt(9);
 		// byte 10 is apparently always 0
-		uint16_t value = processSeptets(data.at(11), data.at(12), data.at(13));    
+		uint16_t value = processSeptets(msg.payloadAt(11), msg.payloadAt(12), msg.payloadAt(13));    
 		
-		String text = extractString(data, 14);
+		String text = extractString(msg, 14);
 		
 		// TODO: Do something with this information...
 		
-		return validateChecksum(data);
+		return validateChecksum(msg);
 	}
 	
-	bool MessageHandler::handleFirmwareVersion(const vector<uint8_t>& data)
+	bool MessageHandler::handleFirmwareVersion(const SysExMessage& msg)
 	{
-		uint16_t version = processSeptets(data.at(5), data.at(6));
+		uint16_t version = processSeptets(msg.payloadAt(5), msg.payloadAt(6));
 
 		// bytes 7-10 apparently are unimportant
 		
 		// TODO: Do something with this information...
 		
-		return validateChecksum(data);
+		return validateChecksum(msg);
 	}
   
-	bool MessageHandler::handleTunerInfo(const vector<uint8_t>& data)
+	bool MessageHandler::handleTunerInfo(const SysExMessage& msg)
 	{
-		if(data.size() >= 8)
+		if(msg.payloadSize() >= 8)
 		{
-		  this->myController->displayTuner(NOTE[data.at(5)], data.at(6), data.at(7));
+		  this->myController->displayTuner(NOTE[msg.payloadAt(5)], msg.payloadAt(6), msg.payloadAt(7));
 		  return true; //No checksum
 		}
 		return false;
 	}  
   
-	bool MessageHandler::handlePresetState(const vector<uint8_t>& data)
+	bool MessageHandler::handlePresetState(const SysExMessage& msg)
 	{
 		uint16_t i=5;
-		while(i < (data.size()-1)) //For the whole data packet, except the checksum
+		while(i < (msg.payloadSize()-1)) //For the whole data packet, except the checksum
 		{
 			//For each block
 		  
 			//Status bits
-			bool enabled = data.at(i) & 0x01;
-			bool yState = data.at(i) & 0x02;
+			bool enabled = msg.payloadAt(i) & 0x01;
+			bool yState = msg.payloadAt(i) & 0x02;
 
-			uint8_t ccNumber = (data.at(i+1) >> 1) + (data.at(i+2) << 6);
+			uint8_t ccNumber = (msg.payloadAt(i+1) >> 1) + (msg.payloadAt(i+2) << 6);
 		  
-			uint8_t effectId = (data.at(i+3) >> 3) + (data.at(i+4) << 4);
+			uint8_t effectId = (msg.payloadAt(i+3) >> 3) + (msg.payloadAt(i+4) << 4);
 		  
 			i+=5;
 		}
 		// TODO Do something with this info
-		return validateChecksum(data);
+		return validateChecksum(msg);
 	}
   
-	bool MessageHandler::handlePresetName(const vector<uint8_t>& data)
+	bool MessageHandler::handlePresetName(const SysExMessage& msg)
 	{
-		String presetName = extractString(data,5);
-		if(validateChecksum(data))
+		String presetName = extractString(msg,5);
+		if(validateChecksum(msg))
 		{
 		this->myController->displayProgramName(presetName);
 		return true;
@@ -258,17 +207,68 @@ namespace midi
 		this->myInterface->updateTempo();
 	}
   
-	bool MessageHandler::handlePresetNumber(const vector<uint8_t>& data)
+	bool MessageHandler::handlePresetNumber(const SysExMessage& msg)
 	{
-		if(validateChecksum(data))
+		if(validateChecksum(msg))
 		{
-			this->myInterface->changePreset(processSeptets(data.at(5), data.at(6)), false);
+			this->myInterface->changePreset(processSeptets(msg.payloadAt(5), msg.payloadAt(6)), false);
 			return true;
 		}
 		else
 		{
 			return false;
 		}
+	}
+	
+	  
+	
+	bool MessageHandler::handleGridRouting(const SysExMessage& msg)
+	{
+		uint8_t effects[GRID_COLUMNS][GRID_ROWS];
+		bool routing[GRID_COLUMNS][GRID_ROWS][GRID_ROWS];
+	 
+		for(uint8_t column=0; column < GRID_COLUMNS; column++)
+		{
+			for(uint8_t row=0; row < GRID_ROWS; row++)
+			{
+				effects[column][row] = processSeptets(msg.payloadAt(5+(column*GRID_ROWS)+row),msg.payloadAt(6+(column*GRID_ROWS)+row));
+        
+				for(uint8_t input=0; input < GRID_ROWS; input++)
+				{
+					routing[column][row][input] = (0x01 << input) & msg.payloadAt(7+(column*GRID_ROWS)+row);
+				}
+			}
+		}
+    
+		//TODO: Do something with this information
+		return validateChecksum(msg);
+	}
+  
+      
+	bool MessageHandler::handleLooperStatus(const SysExMessage& msg)
+	{
+		bool record = 0x01 & msg.payloadAt(5); //Bit 0: Record
+		bool play = 0x02 & msg.payloadAt(5); //Bit 1: Play
+		bool once = 0x04 & msg.payloadAt(5); //Bit 2: Once
+		bool overdub = 0x08 & msg.payloadAt(5); //Bit 3: Overdub
+		bool reverse = 0x10 & msg.payloadAt(5); //Bit 4: Reverse
+		bool half = 0x20 & msg.payloadAt(5); //Bit 5: Half
+		bool undo = 0x40 & msg.payloadAt(5); //Bit 6: Undo
+    
+		uint8_t range = msg.payloadAt(6);
+
+		//TODO Do something with info
+    
+		return validateChecksum(msg);
+	}
+  
+	bool MessageHandler::handleSceneNumber(const SysExMessage& msg)
+	{
+		uint8_t scene = msg.payloadAt(5);
+
+		//TODO Do something with info
+    
+		return validateChecksum(msg);
 	}
   
 	/**************************************************************/
@@ -288,26 +288,26 @@ namespace midi
 	}
 		
 	/* Extract a string stored as a set of MIDI SysEx bytes */
-	String MessageHandler::extractString(const vector<uint8_t>& data, uint8_t start)
+	String MessageHandler::extractString(const SysExMessage& msg, uint8_t start)
 	{
 		String text = "";
 		uint8_t i = start;
-		while(data.at(i) != 0x00) //Stop at null character
+		while(msg.payloadAt(i) != 0x00) //Stop at null character
 		{
-			text += data.at(i); //Concatenate character to string
+			text += msg.payloadAt(i); //Concatenate character to string
 			i++;
 		}
 		return text;
 	}
-  
+	
 	/* Not all functions have checksums */
-	bool MessageHandler::validateChecksum(const vector<uint8_t>& data)
+	bool MessageHandler::validateChecksum(const SysExMessage& msg)
 	{
 		uint8_t checksum = 0xF0;
-		for(uint8_t i=0; i < data.size()-1; i++)
+		for(uint8_t i=0; i < msg.payloadSize()-1; i++)
 		{
-			checksum ^= data.at(i);
+			checksum ^= msg.payloadAt(i);
 		}
-		return (checksum == data.back());
+		return (checksum == msg.payloadAt(msg.payloadSize()-1));
 	}  
 }

@@ -137,10 +137,9 @@ namespace midi
 	void MidiConnection::sendSysEx(const SysExMessage& sysEx) const
 	{
 		Serial.write(0xF0);
-		const vector<uint8_t>& data = sysEx.getData();
-		for(uint8_t i=0; i < data.size(); i++)
+		for(uint8_t i=0; i < sysEx.payloadSize(); i++)
 		{
-		  this->sendData(data.at(i));
+		  this->sendData(sysEx.payloadAt(i));
 		}
 		Serial.write(0xF7);
 	}

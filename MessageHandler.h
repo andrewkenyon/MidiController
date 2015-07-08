@@ -3,7 +3,7 @@
  *  @brief      Handles MidiMessages using the MidiInterface
  *  @version    0.1
  *  @author     Andrew Kenyon
- *  @date       29/06/2015
+ *  @date       08/07/2015
  */
  
 #pragma once
@@ -37,17 +37,17 @@ namespace midi
 			bool handleControlChange(const ControlChangeMessage& msg);
 			bool handleSysEx(const SysExMessage& msg);
 			/* SysEx Messages */
-			bool handleParameter(const std::vector<uint8_t>& data);
-			bool handleModifier(const std::vector<uint8_t>& data);
-			bool handleFirmwareVersion(const std::vector<uint8_t>& data);
-			bool handleTunerInfo(const std::vector<uint8_t>& data);
-			bool handlePresetState(const std::vector<uint8_t>& data);
-			bool handlePresetName(const std::vector<uint8_t>& data);
+			bool handleParameter(const SysExMessage& msg);
+			bool handleModifier(const SysExMessage& msg);
+			bool handleFirmwareVersion(const SysExMessage& msg);
+			bool handleTunerInfo(const SysExMessage& msg);
+			bool handlePresetState(const SysExMessage& msg);
+			bool handlePresetName(const SysExMessage& msg);
 			bool handleTempoBeat();
-			bool handlePresetNumber(const std::vector<uint8_t>& data);
-			bool handleGridRouting(const std::vector<uint8_t>& data);
-			bool handleLooperStatus(const std::vector<uint8_t>& data);
-			bool handleSceneNumber(const std::vector<uint8_t>& data);
+			bool handlePresetNumber(const SysExMessage& msg);
+			bool handleGridRouting(const SysExMessage& msg);
+			bool handleLooperStatus(const SysExMessage& msg);
+			bool handleSceneNumber(const SysExMessage& msg);
 		
 		/****************************************/
 		  
@@ -55,9 +55,9 @@ namespace midi
 			static uint16_t processSeptets(const uint8_t sept0, const uint8_t sept1, const uint8_t sept2);
 			static uint16_t processSeptets(const uint8_t sept0, const uint8_t sept1);	
 							
-			static String extractString(const std::vector<uint8_t>& data, const uint8_t start);
+			static String extractString(const SysExMessage& msg, const uint8_t start);
 			
-			static bool validateChecksum(const std::vector<uint8_t>& data);
+			static bool validateChecksum(const SysExMessage& msg);
 	};
 }
     

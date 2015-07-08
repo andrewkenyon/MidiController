@@ -1,6 +1,10 @@
-// 
-// 
-// 
+/*!
+ *  @file       SysExMessage.cpp
+ *  @brief      System Exclusive Message
+ *  @version    0.1
+ *  @author     Andrew Kenyon
+ *  @date       08/07/2015
+ */
 
 #include "SysExMessage.h"
 
@@ -37,10 +41,22 @@ namespace midi
 			return false;
 		}
 	}
-
-	const vector<uint8_t>& SysExMessage::getData() const
+	
+	const int8_t& SysExMessage::payloadAt(const uint16_t& index) const
 	{
-		return this->myData;
+		if(index < this->myData.size())
+		{
+			return this->myData.at(index);
+		}
+		else
+		{
+			return -1;
+		}
+	}
+	
+	const uint16_t& SysExMessage::payloadSize() const
+	{
+		return this->myData.size();
 	}
 
 }

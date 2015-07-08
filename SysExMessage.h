@@ -1,4 +1,11 @@
-// SysExMessage.h
+/*!
+ *  @file       SysExMessage.h
+ *  @brief      System Exclusive Message
+ *  @version    0.1
+ *  @author     Andrew Kenyon
+ *  @date       08/07/2015
+ */
+
 
 #ifndef _SYSEXMESSAGE_h
 #define _SYSEXMESSAGE_h
@@ -21,7 +28,6 @@ namespace midi
 
 	class SysExMessage : public MidiMessage
 	{
-
 		private:
 			std::vector<uint8_t> myData;
 
@@ -30,7 +36,8 @@ namespace midi
 			virtual ~SysExMessage();
 
 			virtual bool addData(const uint8_t& newData);
-			const std::vector<uint8_t>& getData() const;
+			const int8_t& payloadAt(const uint16_t& index) const;
+			const uint16_t& payloadSize() const;
 	};
 }
 

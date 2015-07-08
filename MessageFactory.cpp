@@ -61,10 +61,9 @@ namespace midi
 	void MessageFactory::generateChecksum(SysExMessage* msg)
 	{
 		uint8_t checksum = 0xF0;
-		const vector<uint8_t>& data = msg->getData();
-		for(uint8_t i=0; i < data.size(); i++)
+		for(uint8_t i=0; i < msg->payloadSize(); i++)
 		{
-			checksum ^= data.at(i);
+			checksum ^= msg->payloadAt(i);
 		}
 		msg->addData(checksum);    
 	}
